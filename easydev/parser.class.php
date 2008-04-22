@@ -15,7 +15,7 @@ class parser{
   var $tokenslist; // token list back from tokenizer
   var $currenttoken; // position of the current token in token list
   var $dbobjectlist; // list of the generated dbobjects
-  var $typelist = array('string', 'integer', 'bool', 'double'); // constant array defining the different types of fields
+  var $typelist = array('string', 'integer', 'bool', 'double', 'text', 'date', 'datetime', 'image'); // constant array defining the different types of fields
   var $finderlist = array('updater', 'finder'); // constant array defining the different types of function that user can define
   var $relationlist = array('relation1N', 'relationNM'); // constant array defining the different types of relations
   var $specialcharlist = array('{', '}', ';', '"', '(', ')', ','); // constant array defining the special chars accepted by the compiler

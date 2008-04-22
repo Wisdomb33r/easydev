@@ -165,3 +165,72 @@ li.errors{
 td.objectmodifyname{
 	width: 200px;
 }
+
+.marginleft{
+	margin-left: 20px;
+}
+
+.deletescript td{
+	padding-left: 10px;
+}
+
+
+/* AUTO-GENERATED FORMS STYLES */
+
+.easydevform table{
+}
+
+.easydevform tr{
+	vertical-align: top;
+}
+
+.easydevform td{
+	font-size: 8pt;
+	font-family: Verdana, Arial, Helvetica;
+}
+
+.easydevform input[type="text"]{
+	font-size: 8pt;
+	font-family: Verdana, Arial, Helvetica;
+	border: 1px solid #AAAAAA;
+	width: 150px;
+}
+
+.easydevform input[type="submit"]{
+	background-color: #F1F100;
+	border: 1px solid #0000FF;
+}
+
+.easydevform select{
+	font-size: 8pt;
+	border: 1px solid #AAAAAA;
+	width: 150px;
+}
+
+.easydevform input[type="checkbox"]{
+	margin-top: 0px;
+	margin-bottom : 0px;
+}
+
+.easydevform input[type="password"]{
+	font-size: 8pt;
+	border: 1px solid #AAAAAA;
+	width: 150px;
+}
+
+.easydevform input[type="file"]{
+	font-size: 8pt;
+	border: 1px solid #AAAAAA;
+	width: 150px;
+}
+
+.easydevform textarea{
+	font-size: 8pt;
+	border: 1px solid #AAAAAA;
+	width: 150px;
+	height: 150px;
+}
+
+.easydevform select.datetime{
+	width: 40px;
+}

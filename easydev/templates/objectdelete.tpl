@@ -43,16 +43,33 @@ else{ // if the request_method == GET
   // print all the objects that are in the database and print a checkbox to choose to delete it
 ?>
 <form action="<?php echo $_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU]; ?>" method="post">
-<table class="form">
+<table class="form deletescript">
+  <tr valign="top">
+    <td></td>
 <?php
-  $query = 'SELECT * FROM object_<% echo $this->name; %> ORDER BY id ASC';
+<%
+foreach($this->fieldlist as $field){
+  switch($field->type){
+  case 'string':
+  case 'integer':
+  case 'double':
+  case 'date':
+  case 'image':
+  case 'datetime':%>
+  echo '    <td><% echo $field->label; %></td>'."\n";<%
+  }
+}
+%>
+?>
+  </tr>
+<?php
+  $query = 'SELECT * FROM object_<% echo $this->name; %> ORDER BY id DESC';
   $result = mysql_query($query) or die('Error while selecting objects list.<br />'.$query);
   
   while($line = mysql_fetch_array($result)){
 ?>
-    <tr>
+  <tr valign="top">
     <td><input class="checkboxinput" type="checkbox" name="deleteids[]" value="<?php echo $line['id']; ?>" /><?php echo $line['id']; ?></td>
-    <td>
 <?php
 <%
 $foundone = false;
@@ -60,20 +77,14 @@ foreach($this->fieldlist as $field){
   switch($field->type){
   case 'string':
   case 'integer':
-  case 'double':
-    if($foundone){
-%>
-  echo ' - '.htmlentities($line['<% echo $field->label; %>']);
-<%
-    }
-    else{
-      $foundone = true;
-%>
-  echo htmlentities($line['<% echo $field->label; %>']);
-<%
-    }
-    break;
   case 'date':
+  case 'datetime':
+  case 'double':%>
+echo '<td>'.htmlentities($line['<% echo $field->label; %>']).'</td>';<%
+    break;
+  case 'image':%>
+echo '    <td><img src="object_image_<% echo $this->name;%>_<% echo $field->label;%>.php?id='.$line['id'].'" width="50" height="50" /></td>';<%
+    break;
   case 'relationNM':
   case 'relation1N':
   case 'bool':
@@ -82,9 +93,8 @@ foreach($this->fieldlist as $field){
 }
 %>
 ?>
-    </td>
     <td><a class="default" href="objectadd_<% echo $this->name; %>.php?<?php echo CURRENTMENU.'='.$_GET[CURRENTMENU]; ?>&objectid=<?php echo $line['id']; ?>"><?php echo htmlentities($translator->translate('modify')); ?></a></td>
-    </tr>
+  </tr>
 <?php
   }
 ?>

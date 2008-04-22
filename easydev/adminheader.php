@@ -4,7 +4,13 @@
 <head>
 <style type="text/css">
   @import url("adminstyle.css");
+
 </style>
+
+<link rel=stylesheet href="calendar.css" type="text/css">
+
+<script type="text/javascript" src="browserSniffer.js"></script>
+<script type="text/javascript" src="calendar.js"></script>
 
 <title><?php echo htmlentities($translator->translate('console_title')); ?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
