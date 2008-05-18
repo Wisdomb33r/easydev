@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- Host: localhost
--- Generation Time: Apr 22, 2008 at 04:38 PM
+-- Generation Time: May 18, 2008 at 12:19 PM
 -- Server version: 5.0.41
 -- PHP Version: 5.2.3
 
@@ -24,7 +24,7 @@ CREATE TABLE `adminmain` (
   `text` varchar(255) collate latin1_german1_ci NOT NULL default '',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `text` (`text`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci AUTO_INCREMENT=25 ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci AUTO_INCREMENT=10 ;
 
 -- 
 -- Dumping data for table `adminmain`
@@ -51,7 +51,7 @@ CREATE TABLE `adminsub` (
   `url` varchar(255) collate latin1_german1_ci NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `id_mainmenu` (`id_mainmenu`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci AUTO_INCREMENT=46 ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci AUTO_INCREMENT=20 ;
 
 -- 
 -- Dumping data for table `adminsub`
@@ -64,7 +64,8 @@ INSERT INTO `adminsub` (`id`, `id_mainmenu`, `text`, `url`) VALUES
 (4, 1, 'console_edit_admin_permissions', 'permissionadmin'),
 (7, 6, 'console_compiler_remove_object', 'removeeasydevobject'),
 (8, 5, 'console_easydev_configure', 'config'),
-(9, 4, 'console_view_admin_logs', 'logsadmin');
+(9, 4, 'console_view_admin_logs', 'logsadmin'),
+(10, 6, 'console_compiler_regen_scripts', 'regenerate');
 
 -- --------------------------------------------------------
 
@@ -78,7 +79,7 @@ CREATE TABLE `authorized_admins` (
   `password` varchar(255) collate latin1_german1_ci NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci AUTO_INCREMENT=5 ;
 
 -- 
 -- Dumping data for table `authorized_admins`
@@ -105,7 +106,7 @@ CREATE TABLE `configuration` (
 
 INSERT INTO `configuration` (`id`, `value`) VALUES 
 ('default_language', 'fr'),
-('version', '1.1');
+('version', '1.2');
 
 -- --------------------------------------------------------
 
@@ -192,7 +193,7 @@ CREATE TABLE `logs` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `log` varchar(255) collate latin1_german1_ci NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci AUTO_INCREMENT=1 ;
 
 -- 
 -- Dumping data for table `logs`
@@ -264,6 +265,7 @@ CREATE TABLE `translation_strings` (
 -- 
 
 INSERT INTO `translation_strings` (`keyword`, `fr`, `en`) VALUES 
+('back_to_list_page', 'Revenir à la liste des objets', 'Back to the object list'),
 ('cancel', 'annuler', 'cancel'),
 ('change_permission', 'changer les permissions', 'change permissions'),
 ('compile', 'compiler', 'compile'),
@@ -294,6 +296,7 @@ INSERT INTO `translation_strings` (`keyword`, `fr`, `en`) VALUES
 ('console_change_admin_permission_header', 'Choisissez l''administrateur dont vous désirez modifier les permissions :', 'Choose the administrator for a permission modification :'),
 ('console_compilation_confirmation', 'La compilation s''est terminée correctement.', 'The compilation has successfully terminated.'),
 ('console_compiler_new_object', 'ajouter', 'add'),
+('console_compiler_regen_scripts', 'regénérer', 'script update'),
 ('console_compiler_remove_object', 'supprimer', 'remove'),
 ('console_config_modify_info', 'Configuration de la console EasyDev : ', 'EasyDev console configuration :'),
 ('console_config_modif_confirmation', 'La configuration a été modifiée correctement.', 'The configuration has been successfully updated.'),
@@ -311,6 +314,9 @@ INSERT INTO `translation_strings` (`keyword`, `fr`, `en`) VALUES
 ('console_permission_admin_change', 'Changement des permissions de l''administrateur : ', 'Change permissions for the administrator : '),
 ('console_permission_admin_confirmation', 'Les modifications de permissions ont été enregistrées correctement.', 'The changes on permissions has been successfully saved.'),
 ('console_personal_info', 'Informations personnelles', 'Personal informations'),
+('console_regeneration_confirmation', 'La regénération des scripts a été effectuée correctement.', 'The script update was performed successfully.'),
+('console_regeneration_link_text', 'regénérer les scripts', 'update the scripts'),
+('console_regeneration_page_title', 'La regénération des scripts permet de réécrire les scripts sur le disque après un changement de version mineure de l''application EasyDev. La regénération se fait en choisissant une compilation effectuée auparavant dans l''application EasyDev.', 'The script update function let you refresh the scripts on the disc after a version update of the EasyDev application. The script update is performed by compilation made on the EasyDev console.'),
 ('console_remove_admin', 'supprimer', 'remove'),
 ('console_remove_admin_confirmation', 'L''administrateur a été correctement supprimé. ', 'The administrator has been successfully deleted.'),
 ('console_remove_admin_header', 'Si vous supprimez un administrateur, ses permissions ainsi que ses informations personnelles seront définitivement supprimés. Les actions dans les logs qu''il a effectuées seront quant à elles conservées. Si vous désirez conserver les informations personnelles de l''administrateur, il est préférable de lui retirer toutes les permissions.', 'If you delete any administrator, his permissions and personal information will be deleted. The logs of his actions are not deleted. If you want to keep his personal informations, you should just delete all his permissions.'),
@@ -322,6 +328,7 @@ INSERT INTO `translation_strings` (`keyword`, `fr`, `en`) VALUES
 ('console_username_error', 'Le nom de l''administrateur ne doit pas contenir de caractères spéciaux.', 'The administrator name must not contains special chars.'),
 ('console_view_admin_logs', 'voir les logs', 'view logs'),
 ('console_wrong_confirm_password_error', 'Le mot de passe et la confirmation ne correspondent pas.', 'The password and the confirmation do not match.'),
+('create_relations', 'Créer les relations', 'Create relations'),
 ('default_language', 'langue par défaut', 'default language'),
 ('delete', 'supprimer', 'delete'),
 ('expected', 'attendu', 'expected'),
@@ -329,11 +336,15 @@ INSERT INTO `translation_strings` (`keyword`, `fr`, `en`) VALUES
 ('generator_add_object_boolean_unset', 'Valeur booléenne (vrai ou faux) attendue pour le champs : ', 'Boolean value (true or false) expected for field : '),
 ('generator_add_object_expected_double', 'Valeur numérique attendue pour le champs : ', 'Numeric value expected for field : '),
 ('generator_add_object_expected_integer', 'Valeur numérique entière attendue pour le champs : ', 'Numeric value expected for field : '),
+('generator_add_object_image_no_file', 'Un fichier de type image doit être insérer.', 'Please insert an image file.'),
+('generator_add_page_submit_button', 'Ajouter', 'Add'),
 ('generator_add_page_title', 'Ajouter un objet dans la base de données', 'Add an object into the database'),
 ('generator_confirm_insert', 'L''objet a été correctement inséré dans la base de données.', 'The object has been successfully added to the database.'),
 ('generator_confirm_modify', 'Les changements pour l''objet ont été enregistrés correctement dans la base de données.', 'The modifications on the object has been successfully saved in database.'),
+('generator_modify_page_title', 'Modifier un objet', 'Modify an object'),
 ('language', 'langue', 'language'),
 ('log_out', 'deconnexion', 'log out'),
+('modify', 'modifier', 'modify'),
 ('name', 'nom', 'name'),
 ('password', 'mot de passe', 'password'),
 ('submit', 'envoyer', 'submit'),

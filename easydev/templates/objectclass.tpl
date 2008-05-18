@@ -211,7 +211,7 @@ foreach($this->fieldlist as $field){
    * @param <% echo $field->label; %> $foreignobject the foreign object to remove from the relation.
    * @return boolean true if the link has been properly removed, false otherwise.
    */
-  public function removerelation<% echo $field->options['relationname']; %>id(<% echo $field->label; %> $foreignobject){
+  public function removerelation<% echo $field->options['relationname']; %>(<% echo $field->label; %> $foreignobject){
 	if($foreignobject->id == 0){
 	  return false;
 	}
@@ -270,7 +270,7 @@ foreach($this->fieldlist as $field){
     $first = false;
     break;
   case 'relation1N':
-    if(!first){
+    if(!$first){
       echo ', ';
     }
     echo '1n_rel_'.$field->options['relationname'];
@@ -292,7 +292,7 @@ foreach($this->fieldlist as $field){
     if(!$first){
       echo '", "';
     }
-    echo '\'.$this->'.$field->label.'.\'';
+    echo '\'.addslashes($this->'.$field->label.').\'';
     $first = false;
     break;
   case 'image':
@@ -328,7 +328,7 @@ foreach($this->fieldlist as $field){
     if(!$first){
       echo ', ';
     }
-    echo $field->label.'="\'.$this->'.$field->label.'.\'"';
+    echo $field->label.'="\'.addslashes($this->'.$field->label.').\'"';
     $first = false;
     break;
   case 'image':
@@ -402,10 +402,19 @@ foreach($this->fieldlist as $field){
   }
 
 
+  /* Count the number of elements in the table of the object.
+   */
+  public static function count(){
+    $query = 'SELECT COUNT(*) FROM object_<% echo $this->name; %>';
+    $result = mysql_query($query) or die('Error while counting objects.<br />'.$query);
+    $line = mysql_fetch_array($result);
+    return $line[0];
+  }
+
   /* General finder. Returns all the objects of the database.
    */
-  public static function find(){
-    $query = 'SELECT * FROM object_<% echo $this->name; %>';
+  public static function find($lim = 0){
+    $query = 'SELECT * FROM object_<% echo $this->name; %> ORDER BY id DESC LIMIT '.$lim.', 20';
     $result = mysql_query($query) or die('Error while loading objects.<br />'.$query);
     $objectlist = array();
     while($line = mysql_fetch_array($result)){
@@ -448,13 +457,13 @@ foreach($this->fieldlist as $field){
               .'WHERE id_<% echo $this->name; %>="'.$line['id'].'"';<%
     }
     else{%>
-      $query = 'SELECT id_<% echo $this->name; %> FROM object_<% echo $this->name; %>_<% echo $field->label; %>_<% echo $field->options['relationname']; %>_nmrelation '
-              .'WHERE id_<% echo $field->label; %>="'.$line['id'].'"';<%
+      $query = 'SELECT id_<% echo $field->label; %> FROM object_<% echo $this->name; %>_<% echo $field->label; %>_<% echo $field->options['relationname']; %>_nmrelation '
+              .'WHERE id_<% echo $this->name; %>="'.$line['id'].'"';<%
     }%>
-      $result = mysql_query($query) or die('Error while selecting N:M relations.<br />'.$query);
+      $result2 = mysql_query($query) or die('Error while selecting N:M relations.<br />'.$query);
 
       $relationNMidlist = array();
-      while($row = mysql_fetch_array($result)){
+      while($row = mysql_fetch_array($result2)){
         $relationNMidlist[] = $row[0];
       }
       $object->set<% echo $field->options['relationname']; %>ids($relationNMidlist);<%
@@ -512,13 +521,13 @@ foreach($this->fieldlist as $field){
               .'WHERE id_<% echo $this->name; %>="'.$line['id'].'"';<%
     }
     else{%>
-      $query = 'SELECT id_<% echo $this->name; %> FROM object_<% echo $this->name; %>_<% echo $field->label; %>_<% echo $field->options['relationname']; %>_nmrelation '
-              .'WHERE id_<% echo $field->label; %>="'.$line['id'].'"';<%
+      $query = 'SELECT id_<% echo $field->label; %> FROM object_<% echo $this->name; %>_<% echo $field->label; %>_<% echo $field->options['relationname']; %>_nmrelation '
+              .'WHERE id_<% echo $this->name; %>="'.$line['id'].'"';<%
     }%>
-      $result = mysql_query($query) or die('Error while selecting N:M relations.<br />'.$query);
+      $result2 = mysql_query($query) or die('Error while selecting N:M relations.<br />'.$query);
 
       $relationNMidlist = array();
-      while($row = mysql_fetch_array($result)){
+      while($row = mysql_fetch_array($result2)){
         $relationNMidlist[] = $row[0];
       }
       $object->set<% echo $field->options['relationname']; %>ids($relationNMidlist);<%
@@ -600,10 +609,10 @@ foreach($this->fieldlist as $field){
       $query = 'SELECT id_<% echo $this->name; %> FROM object_<% echo $this->name; %>_<% echo $field->label; %>_<% echo $field->options['relationname']; %>_nmrelation '
               .'WHERE id_<% echo $field->label; %>="'.$line['id'].'"';<%
     }%>
-      $result = mysql_query($query) or die('Error while selecting N:M relations.<br />'.$query);
+      $result2 = mysql_query($query) or die('Error while selecting N:M relations.<br />'.$query);
 
       $relationNMidlist = array();
-      while($row = mysql_fetch_array($result)){
+      while($row = mysql_fetch_array($result2)){
         $relationNMidlist[] = $row[0];
       }
       $object->set<% echo $field->options['relationname']; %>ids($relationNMidlist);<%
@@ -652,7 +661,8 @@ foreach($field->options['finderparameters'] as $param){
    * @param string $action If the form should not post the values on the same script ($_SERVER['PHP_SELF']), $action can be specified as a GET URL.
    * @return string The HTML code of the form.
    */
-  public static function getForm($submittext, $postedobject=null, $action=null){<%
+  public static function getForm($submittext, $postedobject=null, $action=null){
+    $translator = new translator();<%
 // find if there is any image field
 $isTherePic = false;
 foreach($this->fieldlist as $field){
@@ -663,32 +673,40 @@ foreach($this->fieldlist as $field){
 %>
     $ret = '<form class="easydevform marginleft" name="<% echo $this->name;%>form" action="'.($action == null ? $_SERVER['PHP_SELF'] : $action).'" method="post" <% if($isTherePic == true) echo 'enctype="multipart/form-data"'; %>>'."\n";
     $ret .= '<table>'."\n";<%
-foreach($this->fieldlist as $field){%>
-    $ret .= '  <tr>'."\n";<%
+foreach($this->fieldlist as $field){
   switch($field->type){
   case 'integer':
   case 'string':
   case 'double': %>
+    $ret .= '  <tr>'."\n";
     $ret .= '    <td><% echo $field->label;%> : </td>'."\n".
-            '    <td><input type="text" name="<% echo $field->label;%>" '.($postedobject != null ? 'value="'.$postedobject-><% echo $field->label;%>.'"' : '').'/>'."\n";<%
+            '    <td><input type="text" name="<% echo $field->label;%>" '.($postedobject != null ? 'value="'.htmlentities($postedobject-><% echo $field->label;%>).'"' : '').'/>'."\n";
+    $ret .= '  </tr>'."\n";<%
     break;
   case 'text': %>
+    $ret .= '  <tr>'."\n";
     $ret .= '    <td><% echo $field->label;%> : </td>'."\n".
-            '    <td><textarea name="<% echo $field->label;%>">'.($postedobject != null ? htmlentities($postedobject-><% echo $field->label;%>) : '').'</textarea>'."\n";<%
+            '    <td><textarea name="<% echo $field->label;%>">'.($postedobject != null ? htmlentities($postedobject-><% echo $field->label;%>) : '').'</textarea>'."\n";
+    $ret .= '  </tr>'."\n";<%
     break;
   case 'bool': %>
+    $ret .= '  <tr>'."\n";
     $ret .= '    <td><% echo $field->label;%> : </td>'."\n".
             '    <td><select name="<% echo $field->label; %>">'."\n".
             '      <option value=""></option>'."\n".
-            '      <option value="true" '.($postedobject != null && $postedobject-><% echo $field->label; %> == 'true' ? 'selected' : '').'>true</option>'."\n".
-            '      <option value="false" '.($postedobject != null && $postedobject-><% echo $field->label; %> == 'false' ? 'selected' : '').'>false</option>'."\n".
-            '    </td>'."\n";<%
+            '      <option value="1" '.($postedobject != null && $postedobject-><% echo $field->label; %> == '1' ? 'selected' : '').'>'.$translator->translate('true').'</option>'."\n".
+            '      <option value="0" '.($postedobject != null && $postedobject-><% echo $field->label; %> == '0' ? 'selected' : '').'>'.$translator->translate('false').'</option>'."\n".
+            '    </td>'."\n";
+    $ret .= '  </tr>'."\n";<%
     break;
   case 'image': %>
+    $ret .= '  <tr>'."\n";
     $ret .= '    <td><% echo $field->label;%> : </td>'."\n".
-            '    <td><input type="file" name="<% echo $field->label;%>">'."\n";<%
+            '    <td><input type="file" name="<% echo $field->label;%>">'."\n";
+    $ret .= '  </tr>'."\n";<%
     break;
   case 'date': %>
+    $ret .= '  <tr>'."\n";
     $ret .= '    <td><% echo $field->label;%> : </td>'."\n".
             '    <td><input type="text" name="<% echo $field->label;%>" '.($postedobject != null ? 'value="'.$postedobject-><% echo $field->label;%>.'"' : '').'/>'."\n".
             '    <script language="JavaScript" type="text/javascript">'."\n".
@@ -703,9 +721,11 @@ foreach($this->fieldlist as $field){%>
             '    //-->'."\n".
             '    </script><div style="visibility: hidden;" class="dynCalendar" id="dynCalendar_layer_1" onmouseover="dynVar<% echo $field->label;%>._mouseover(true)" onmouseout="dynVar<% echo $field->label;%>._mouseover(false)"></div>'."\n".
             '    <noscript><span><i>(yyyy-mm-dd)</i></span></noscript>'."\n".
-            '    </td>'."\n";<%
+            '    </td>'."\n";
+    $ret .= '  </tr>'."\n";<%
     break;
   case 'datetime': %>
+    $ret .= '  <tr>'."\n";
     $ret .= '    <td><% echo $field->label;%> : </td>'."\n".
             '    <td><input type="text" name="<% echo $field->label;%>date" '.($postedobject != null && $postedobject-><% echo $field->label;%> != '' && date('Y-m-d', strtotime($postedobject-><% echo $field->label;%>)) != '1970-01-01' ? 'value="'.date('Y-m-d', strtotime($postedobject-><% echo $field->label;%>)).'"' : '').'/>'."\n".
             '    <script language="JavaScript" type="text/javascript">'."\n".
@@ -722,25 +742,70 @@ foreach($this->fieldlist as $field){%>
             '    <noscript><span><i>(yyyy-mm-dd)</i></span></noscript>'."\n".
             '    <select class="datetime" name="<% echo $field->label;%>hour">'."\n".
             '       <option value=""></option>'."\n";
-    for($i = 1; $i <= 24; $i++){
+    for($i = 0; $i <= 24; $i++){
       $ret .= '      <option value="'.($i < 10 ? '0'.$i : $i).'"'.($postedobject != null && $postedobject-><% echo $field->label;%> != '' && date('H', strtotime($postedobject-><% echo $field->label;%>)) == $i ? ' selected="selected"' : '').'>'.$i.'</option>'."\n";
     }
     $ret .= '    </select> h '."\n".
             '    <select class="datetime" name="<% echo $field->label;%>mins">'."\n".
             '       <option value=""></option>'."\n";
-    for($i = 1; $i <= 60; $i++){
+    for($i = 0; $i <= 60; $i++){
       $ret .= '      <option value="'.($i < 10 ? '0'.$i : $i).'"'.($postedobject != null && $postedobject-><% echo $field->label;%> != '' && date('i', strtotime($postedobject-><% echo $field->label;%>)) == $i ? ' selected="selected"' : '').'>'.$i.'</option>'."\n";
     }
     $ret .= '    </select>'."\n".
             '    </td>'."\n".
             '  </tr>'."\n".
             '  <tr valign="top">'."\n".
-            '    <td></td><td><input type="checkbox" name="<% echo $field->label;%>now" value="now" /> CURRENT TIME</td>'."\n";<%
+            '    <td></td><td><input type="checkbox" name="<% echo $field->label;%>now" value="now" /> CURRENT TIME</td>'."\n";
+    $ret .= '  </tr>'."\n";<%
+    break;
+  case 'relation1N': 
+	// find the labels which can be displayed as text from the table it is linked to
+	$query = 'DESCRIBE object_'.$field->label;
+	$result = mysql_query($query) or die('Error while getting table description.<br />'.$query);
+	
+	$textfields = array(); // the fields of the database which can be diplayed as text. 
+	// this list will be used later to print a select list, so ids and other relations should not be taken into account.
+	while($line = mysql_fetch_array($result)){
+	  $triplet = substr($line['Type'], 0, 3);
+	  switch($triplet){
+	  case 'int':
+	  case 'tin':
+	  case 'var':
+        case 'dat':
+	  case 'dou':
+		// if the type of the field is int, tinyint, text or double, it can be printed as text
+		if($line['Field'] != 'id' && substr($line['Field'], 0, 3) != 'id_'){// remove the primary key and relations
+		  array_push($textfields, $line['Field']);
+		}
+		break;
+	  default:
+		break;
+	  }
+	}
+	
+	// now we have in $textfields all the fields that can be represented as text in a select list
+%>
+    $ret .= '  <tr>'."\n";
+    $ret .= '    <td><% echo $field->options['relationname']; %> : </td>';
+    // we can make the select list
+    $query = 'SELECT * FROM object_<% echo $field->label; %> ORDER BY id';
+    $result = mysql_query($query) or die('Error while selecting object list.<br />'.$query);
+    
+    $ret .= '    <td><select class="selectinput" name="<% echo $field->options['relationname']; %>">'."\n";
+    while($line = mysql_fetch_array($result)){
+	$ret .= '      <option value="'.$line['id'].'"'.($postedobject != null && $postedobject->relation1N<% echo $field->options['relationname'];%> == $line['id'] ? ' selected="selected"' : '').'>'.$line['id'];
+<%
+foreach($textfields as $textfield){%>
+      $ret .=  ' - '.$line['<% echo $textfield; %>'];<%
+}%>
+    $ret .= '</option>'."\n";
+  }
+  $ret .= '    </select></td>'."\n";
+    $ret .= '  </tr>'."\n";<%
     break;
   default:
     break;
-  }%>
-    $ret .= '  </tr>'."\n";<%
+  }
 }
 %>
     $ret .= '  <tr>'."\n".
@@ -775,7 +840,7 @@ foreach($this->fieldlist as $field){
     }<%
     break;
   case 'bool': %>
-    if($posted['<% echo $field->label; %>'] != 'true' && $posted['<% echo $field->label; %>'] != 'false'){
+    if($posted['<% echo $field->label; %>'] !== '1' && $posted['<% echo $field->label; %>'] !== '0'){
       $errors[] = $translator->translate('generator_add_object_boolean_unset').'<% echo $field->label;%>';
     }<%
     break;
@@ -790,10 +855,10 @@ foreach($this->fieldlist as $field){
     if(count($exploded) != 3 || $exploded[0] < 1900 || $exploded[0] > 2050 || $exploded[1] > 12 || $exploded[1] < 1 || $exploded[2] > 31 || $exploded[2] < 1){
       $errors[] = $translator->translate('generator_add_object_date_format_error').'<% echo $field->label;%>';
     }
-    if($posted['<% echo $field->label; %>hour'] > 24 || $posted['<% echo $field->label; %>hour'] < 1){
+    if($posted['<% echo $field->label; %>hour'] > 24 || $posted['<% echo $field->label; %>hour'] < 0 || $posted['<% echo $field->label; %>hour'] === ''){
       $errors[] = $translator->translate('generator_add_object_hour_format_error').'<% echo $field->label;%>';
     }
-    if($posted['<% echo $field->label; %>mins'] > 60 || $posted['<% echo $field->label; %>mins'] < 1){
+    if($posted['<% echo $field->label; %>mins'] > 60 || $posted['<% echo $field->label; %>mins'] < 0 || $posted['<% echo $field->label; %>mins'] === ''){
       $errors[] = $translator->translate('generator_add_object_mins_format_error').'<% echo $field->label;%>';
     }<%
     break;
@@ -883,10 +948,10 @@ foreach($this->fieldlist as $field){
 			imagegif($resizedresource);
 			break;
 		  case IMAGETYPE_JPEG:
-			imagejpeg($resizedresource, 95);
+			imagejpeg($resizedresource, null, 95);
 			break;
 		  case IMAGETYPE_PNG:
-			imagepng($resizedresource, 2);
+			imagepng($resizedresource, null, 2);
 			break;
 		  default:
 			$errors[] = $translator->translate('generator_add_object_image_bad_type').'<% echo $name;%>';

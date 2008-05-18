@@ -1,9 +1,9 @@
 <?php
 
 $hostname = 'localhost';
-$username = 'username';
-$password = 'password';
-$nom_de_base = 'database_name';
+$username = 'easydev';
+$password = 't53cE56n6';
+$nom_de_base = 'easydev0';
 
 
 $link = mysql_connect("$hostname", "$username", "$password") or die("Could not connect");

@@ -26,7 +26,8 @@ else{ // if the user has the permissions
 
 	// NOTE : as all relations are InnoDB links, there is no need to touch ADMINSUB neither EASYDEV_OBJECTS neither EASYDEV_OBJECTS_FOREIGN_KEY
 	//        the delete will cascade to them by deleting the ADMINMAIN
-	foreach($_POST['deleteids'] as $delete){
+	$deleteids = isset($_POST['deleteids']) && is_array($_POST['deleteids']) ? $_POST['deleteids'] : array();
+	foreach($deleteids as $delete){
 	  // verify if a foreign key is pointing on this table
 	  $query = 'SELECT id_object FROM '.EASYDEV_OBJECTS_FOREIGN_KEY.' WHERE id_foreign_object="'.$delete.'"';
 	  $result = mysql_query($query) or die('Error while selecting foreign key.<br />'.$query);

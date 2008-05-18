@@ -11,5 +11,5 @@ define('ADMINSUB'                          , 'adminsub');
 define('PERMISSION_ADMINS'                 , 'permission_admins');
 define('AUTHORIZED_ADMINS'                 , 'authorized_admins');
 define('CONFIGURATION'                     , 'configuration');
-define('LOG'                               , 'logs');
+define('LOGS'                               , 'logs');
 ?>

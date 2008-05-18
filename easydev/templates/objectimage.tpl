@@ -13,8 +13,33 @@ if(isset($_GET['id'])){
   if($object){
     header('Content-type: '.image_type_to_mime_type($object-><% echo $fieldname; %>_type));
     header('Content-disposition: inline');
-
-    echo $object-><% echo $fieldname; %>;
+    if(isset($_GET['width']) && $_GET['width'] > 0){
+      $resource = imagecreatefromstring($object-><% echo $fieldname;%>);
+      $w = imagesx($resource);
+      $h = imagesy($resource);
+      $newwidth = $_GET['width'];
+      $newheight = $newwidth * $h / $w;
+      if($resource){
+        $resizedresource = imagecreatetruecolor($newwidth, $newheight);
+        $status = imagecopyresized($resizedresource, $resource, 0, 0, 0, 0, $newwidth, $newheight, $w, $h);
+        if($status){
+          switch($object-><% echo $fieldname;%>_type){
+          case IMAGETYPE_GIF:
+            imagegif($resizedresource);
+            break;
+          case IMAGETYPE_JPEG:
+            imagejpeg($resizedresource, null, 95);
+            break;
+          case IMAGETYPE_PNG:
+            imagepng($resizedresource, null, 2);
+            break;
+          }
+        }
+      }
+    }
+    else{
+      echo $object-><% echo $fieldname; %>;
+    }
     exit();
   }
 }   

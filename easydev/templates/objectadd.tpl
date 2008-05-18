@@ -6,8 +6,13 @@
  ********************************************************************************/
 
 // require the includes
-require_once('includes.php');
-require_once('object_<% echo $this->name; %>.class.php');
+require_once 'includes.php';
+require_once 'object_<% echo $this->name; %>.class.php';<%
+foreach($this->fieldlist as $field){
+  if($field->type == 'relation1N'){%>
+require_once 'object_<% echo $field->label; %>.class.php';<%
+  }
+}%>
 
 // first set a variable to indicate to which "mainmenu" this script belongs to in the administration console.
 $adminMainMenu = <% echo $mainmenuid; %>;
@@ -18,7 +23,7 @@ if(! $session_permissions[$adminMainMenu]){ // the user should not see this page
   exit;
 }
 
-if($_SERVER[REQUEST_METHOD] == 'POST'){ // if server method request == POST
+if($_SERVER['REQUEST_METHOD'] == 'POST'){ // if server method request == POST
   $errors = array(); // to remember all the form errors
 
   // for datetime, need to construct the final value based on date + hour + minutes<%
@@ -53,8 +58,8 @@ foreach($this->fieldlist as $field){
   }
 }%>
 	  
-  if(count($errors) == 0){ // case there is no errors in the generated script
-    // no errors in data type has been found, store data in an object
+  if(count($errors) == 0){ // if there is no errors in the values sent by user
+    // store data in an object
     $object = null;
     if(isset($_GET['objectid']) && ($object = <% echo $this->name; %>::findByPrimaryId($_GET['objectid']))){ // we want to modify an object, need to retrieve it (if exists)
 
@@ -77,7 +82,7 @@ foreach($this->fieldlist as $field){
       }<%
     break;
   case 'relation1N':%>
-      $object->1n_rel_<% $field->options['relationname']; %> = $_POST['<% echo $field->options['relationname']; %>'];<%
+      $object->relation1N<% echo $field->options['relationname']; %> = $_POST['<% echo $field->options['relationname']; %>'];<%
     break;
   }
 }%>
@@ -110,11 +115,6 @@ foreach($this->fieldlist as $field){
     echo '$imageinfos'.$field->label.'[0], $imageinfos'.$field->label.'[1]';
     break;
   case 'relation1N': // only if the type is a relation1N, need to select the relationname
-    if(!first){
-      echo ', ';
-    }
-    $first = false;
-    echo '1n_rel_'.$field->options['relationname'];
     break;
   }
 } 
@@ -122,9 +122,22 @@ foreach($this->fieldlist as $field){
 // END ---- list all fields for the new object
  %>);
 
+      // set all the relations1N that have been chosen<%
+foreach($this->fieldlist as $field){
+  if($field->type == 'relation1N'){%>
+      $object->setrelation<% echo $field->options['relationname'];%>(<% echo $field->label;%>::findByPrimaryId($_POST['<% echo $field->options['relationname'];%>']));
+<%
+  }
+}%>
     }
     // store the object in the database
     $object->store();
+
+    $objectid = $object->id;
+
+    // fill the log
+    $query = 'INSERT INTO '.LOGS.' (log) VALUES ("'.date('Y-m-d H:i').' : '.(isset($_GET['objectid']) ? 'Modification on object \"<% echo $this->name;%>\" with id \"'.$_GET['objectid'].'\" done by '.$_SESSION[SESSION_NAME].'.' : 'New object \"<% echo $this->name; %>\" with id \"'.$objectid.'\" added by '.$_SESSION[SESSION_NAME].'.').'")';
+    mysql_query($query) or die('Error while inserting log.<br />'.$query);
     
     // redirect on the same page but with a message for indicating that the entry was done successfully
     header('Location: '.(isset($_GET['objectid']) ? 'objectdelete_<% echo $this->name; %>.php' : $_SERVER['PHP_SELF']).'?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'&action='.(isset($_GET['objectid']) ? 'confirmmodify' : 'confirminsert'));
@@ -198,18 +211,21 @@ foreach($this->fieldlist as $field){
     $first = false;
     echo 'null, null';
     break;
-  case 'relation1N': // only if the type is a relation1N, need to select the relationname
-    if(!first){
-      echo ', ';
-    }
-    $first = false;
-    echo 'stripslashes($posted[\'1n_rel_'.$field->options['relationname'].'\'])';
+  case 'relation1N': 
     break;
   }
 } 
 
 // END ---- list all fields for the new object
 %>);
+
+// restore all relation 1N<%
+foreach($this->fieldlist as $field){
+  if($field->type == 'relation1N'){%>
+    $object->relation1N<% echo $field->options['relationname'];%> = $posted['<% echo $field->options['relationname'];%>'];<%
+  }
+}
+%>
 
     // do not forget to remove these two variables
     unset($_SESSION[SESSION_ERRORS]);

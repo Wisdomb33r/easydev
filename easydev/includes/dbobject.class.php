@@ -240,10 +240,11 @@ class dbobject{
    * @param string $relationfieldname The name of the object with which the relation is. Useful only if the object has several NM relations.
    * @param boolean $foreign Indicates if the script should generate the page for the foreign object
    */ 
-  public function htmlNMRelationGenerator($mainmenuid, $relationfield, $foreign=false){
+  public function htmlNMRelationGenerator($mainmenuid, $relationfield, $foreignobject, $foreign=false){
 	$predefinedvariables = array();
 	$predefinedvariables['mainmenuid'] = $mainmenuid;
 	$predefinedvariables['relationfield'] = $relationfield;
+	$predefinedvariables['foreignobject'] = $foreignobject;
 	$predefinedvariables['foreign'] = $foreign;
 	$script = $this->useTemplate('objectNMrel.tpl', $predefinedvariables);
 	

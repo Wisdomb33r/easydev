@@ -40,14 +40,6 @@ else{ // user should not see the page, let's redirect on index.php where user ca
   exit;
 }
 
-// add slashes for GET and POST values
-foreach($_GET as $get){
-  $get = addslashes($get);
-}
-foreach($_POST as $post){
-  $post = addslashes($post);
-}
-
 // verify that user has permission to view the opened menu he wants to see
 if(isset($_GET[CURRENTMENU])){ // if the user wants to see the content of a menu
   if(! $session_permissions[$_GET[CURRENTMENU]]){

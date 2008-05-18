@@ -6,6 +6,7 @@
  ********************************************************************************/
 
 require_once('includes.php'); // includes of the generated script
+require_once('object_<% echo $this->name;%>.class.php'); // include the class needed for the script
  
 // first set a variable to indicate to which "mainmenu" this script belongs to in the administration console.
 $adminMainMenu = <% echo $mainmenuid; %>;
@@ -16,18 +17,30 @@ if(! $session_permissions[$adminMainMenu]){ // the user should not see this page
   exit;
 }
 
-if($_SERVER[REQUEST_METHOD] == 'POST'){// if server method request == POST
+if($_SERVER['REQUEST_METHOD'] == 'POST'){// if server method request == POST
   // delete all the ids the user checked in the object list
   foreach($_POST['deleteids'] as $deleteid){
     $query = 'DELETE FROM object_<% echo $this->name; %> WHERE id="'.$deleteid.'"';
     mysql_query($query) or die('Error while deleting object.<br />'.$query);
+
+    $query = 'INSERT INTO '.LOGS.' (log) VALUES ("'.date('Y-m-d H:i').' : '.'Object \"<% echo $this->name;%>\" with id \"'.$deleteid.'\" deleted by '.$_SESSION[SESSION_NAME].'.")';
+    mysql_query($query) or die('Error while inserting log.<br />'.$query);
   }
   
   // make a redirection on the same page
    header('Location: '.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'&action=confirmdelete');
   exit;
 }
-else{ // if the request_method == GET
+else{ // if the request_method == GET<%
+foreach($this->fieldlist as $field){
+  if($field->type == 'image'){%>
+  if(isset($_GET['action']) && $_GET['action'] == 'view<% echo $this->name.$field->label;%>' && isset($_GET['id'])){
+    echo '<html><head><link rel=stylesheet href="adminstyle.css" type="text/css"></head><body>'."\n".'<p class="center"><img src="object_image_<% echo $this->name;%>_<% echo $field->label; %>.php?id='.$_GET['id'].'" />'."\n".'<br /><a class="default" href="'.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'">'.$translator->translate('back_to_list_page').'</a></p>'."\n".'</body></html>';
+    exit();
+  }<%
+  }
+}%>
+
   // includes the header of the page
   include 'adminheader.php';
   
@@ -63,14 +76,12 @@ foreach($this->fieldlist as $field){
 ?>
   </tr>
 <?php
-  $query = 'SELECT * FROM object_<% echo $this->name; %> ORDER BY id DESC';
-  $result = mysql_query($query) or die('Error while selecting objects list.<br />'.$query);
+  $objectlist = <% echo $this->name; %>::find((isset($_GET[NAVIGATION]) ? $_GET[NAVIGATION] : 0));
+  $objectnumber = <% echo $this->name; %>::count();
   
-  while($line = mysql_fetch_array($result)){
-?>
-  <tr valign="top">
-    <td><input class="checkboxinput" type="checkbox" name="deleteids[]" value="<?php echo $line['id']; ?>" /><?php echo $line['id']; ?></td>
-<?php
+  foreach($objectlist as $object){
+  echo '  <tr valign="top">'."\n";
+  echo '    <td width="50"><input class="checkboxinput" type="checkbox" name="deleteids[]" value="'.$object->id.'" />'.$object->id.'</td>'."\n";
 <%
 $foundone = false;
 foreach($this->fieldlist as $field){
@@ -80,10 +91,10 @@ foreach($this->fieldlist as $field){
   case 'date':
   case 'datetime':
   case 'double':%>
-echo '<td>'.htmlentities($line['<% echo $field->label; %>']).'</td>';<%
+    echo '    <td>'.htmlentities($object-><% echo $field->label; %>).'</td>';<%
     break;
   case 'image':%>
-echo '    <td><img src="object_image_<% echo $this->name;%>_<% echo $field->label;%>.php?id='.$line['id'].'" width="50" height="50" /></td>';<%
+    echo '    <td><a href="'.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'&amp;action=view<% echo $this->name.$field->label; %>&amp;id='.$object->id.'"><img src="object_image_<% echo $this->name;%>_<% echo $field->label;%>.php?id='.$object->id.'&amp;width=50" /></a></td>';<%
     break;
   case 'relationNM':
   case 'relation1N':
@@ -92,20 +103,21 @@ echo '    <td><img src="object_image_<% echo $this->name;%>_<% echo $field->labe
   }
 }
 %>
-?>
-    <td><a class="default" href="objectadd_<% echo $this->name; %>.php?<?php echo CURRENTMENU.'='.$_GET[CURRENTMENU]; ?>&objectid=<?php echo $line['id']; ?>"><?php echo htmlentities($translator->translate('modify')); ?></a></td>
-  </tr>
-<?php
+
+    echo '    <td><a class="default" href="objectadd_<% echo $this->name; %>.php?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'&objectid='.$object->id.'">'.htmlentities($translator->translate('modify')).'</a></td>'."\n";
+    echo '  </tr>'."\n";
   }
-?>
-  <tr>
-    <td></td>
-    <td><input class="bouton" type="submit" name="delete<% echo $this->name; %>submit" value="<?php echo htmlentities($translator->translate('delete')); ?>" /></td>
-    <td></td>
-  </tr>
-</table>
-</form>
-<?php
+  echo '  <tr>'."\n";
+  echo '    <td></td>'."\n";
+  echo '    <td><input class="bouton" type="submit" name="delete<% echo $this->name; %>submit" value="'.htmlentities($translator->translate('delete')).'" /></td>'."\n";
+  echo '    <td></td>'."\n";
+  echo '  </tr>'."\n";
+  echo '</table>'."\n";
+  echo '</form>'."\n";
+
+  // add "next" and "previous" buttons to navigate between the pages of the objects
+  echo '<p>'.$translator->translate('pages').' : '.(isset($_GET[NAVIGATION]) && $_GET[NAVIGATION] > 0 ? '<a href="'.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'&amp;'.NAVIGATION.'='.($_GET[NAVIGATION] - 20 <= 0 ? 0 : $_GET[NAVIGATION] - 20).'"><img src="lfleche.jpg" alt="<" /></a> ' : '').((! isset($_GET[NAVIGATION]) && $objectnumber > 20) || $_GET[NAVIGATION] + 20 < $objectnumber ? ' <a href="'.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'&amp;'.NAVIGATION.'='.($_GET[NAVIGATION] + 20).'"><img src="rfleche.jpg" alt=">" /></a>' : '').'</p>'."\n";
+
   // include the footer of the page
   include 'adminfooter.php';
 }

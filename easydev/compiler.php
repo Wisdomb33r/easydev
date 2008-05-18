@@ -163,9 +163,17 @@ else{ // if the user has the permissions
 			  '"objectnmrel_'.$field->label.'_'.$dbobject->name.'_'.$field->options['relationname'].'")';
 			mysql_query($query) or die('Error while inserting new sub menu entry.<br />'.$query);
 			
+			// find the foreign object
+			$foreignobject = null;
+			foreach($dbobjects as $obj){
+			  if($obj->name == $field->label){
+				$foreignobject = $obj;
+			  }
+			}
+
 			// write the scripts for relations on disc
-			$localRelCode = $dbobject->htmlNMRelationGenerator($mainmenuid, $field);
-			$foreignRelCode = $dbobject->htmlNMRelationGenerator($foreignid, $field, true);
+			$localRelCode = $dbobject->htmlNMRelationGenerator($mainmenuid, $field, $foreignobject);
+			$foreignRelCode = $dbobject->htmlNMRelationGenerator($foreignid, $field, $foreignobject, true);
 			if(file_exists('objectnmrel_'.$field->label.'_'.$dbobject->name.'_'.$field->options['relationname'].'.php') 
 			   || file_exists('objectnmrel_'.$dbobject->name.'_'.$field->label.'_'.$field->options['relationname'].'.php')){
 			  $query = 'ROLLBACK';

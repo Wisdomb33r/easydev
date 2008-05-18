@@ -18,6 +18,7 @@ define('DEFAULT_LANGUAGE_TAG'       , 'fr');
 
 // variables used several times in the scripts
 define('CURRENTMENU'                , 'menuid');
+define('NAVIGATION'                 , 'pagenavigation');
 
 // the menu id's for those who will not change (basic administration pages)
 define('ADMIN_MENU_ID'              , '1');
