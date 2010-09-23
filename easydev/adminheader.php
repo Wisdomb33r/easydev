@@ -11,6 +11,7 @@
 
 <script type="text/javascript" src="browserSniffer.js"></script>
 <script type="text/javascript" src="calendar.js"></script>
+<script type="text/javascript" src="functions.js"></script>
 
 <title><?php echo htmlentities($translator->translate('console_title')); ?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -43,7 +44,7 @@ $result = mysql_query($query) or die('Error while selecting main sections.<br />
 
 while($line = mysql_fetch_array($result)) {
   if($session_permissions[$line['id']] == 0) { //if the user has no permissions to see the content of the menu
-    echo '        <li class="menumain"><img class="adminmenu" src="cadena.jpg" alt="locked" />'.$translator->translate($line['text']).'</li>'."\n";
+    //echo '        <li class="menumain"><img class="adminmenu" src="cadena.jpg" alt="locked" />'.$translator->translate($line['text']).'</li>'."\n";
   }
   else{ // if the user has permission to see the menu
 	// if the menu id is the one that user wants to see

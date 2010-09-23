@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- Host: localhost
--- Generation Time: May 18, 2008 at 12:19 PM
+-- Generation Time: Sep 23, 2010 at 12:19 PM
 -- Server version: 5.0.41
 -- PHP Version: 5.2.3
 
@@ -106,7 +106,7 @@ CREATE TABLE `configuration` (
 
 INSERT INTO `configuration` (`id`, `value`) VALUES 
 ('default_language', 'fr'),
-('version', '1.2');
+('version', '1.3');
 
 -- --------------------------------------------------------
 
@@ -249,22 +249,22 @@ INSERT INTO `translation_languages` (`id`, `language`, `tag`) VALUES
 
 -- --------------------------------------------------------
 
--- 
--- Table structure for table `translation_strings`
--- 
+--
+-- Structure de la table `translation_strings`
+--
 
-CREATE TABLE `translation_strings` (
+CREATE TABLE IF NOT EXISTS `translation_strings` (
   `keyword` varchar(64) collate latin1_german1_ci NOT NULL,
   `fr` text collate latin1_german1_ci,
   `en` text collate latin1_german1_ci,
   PRIMARY KEY  (`keyword`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci;
 
--- 
--- Dumping data for table `translation_strings`
--- 
+--
+-- Contenu de la table `translation_strings`
+--
 
-INSERT INTO `translation_strings` (`keyword`, `fr`, `en`) VALUES 
+INSERT INTO `translation_strings` (`keyword`, `fr`, `en`) VALUES
 ('back_to_list_page', 'Revenir à la liste des objets', 'Back to the object list'),
 ('cancel', 'annuler', 'cancel'),
 ('change_permission', 'changer les permissions', 'change permissions'),
@@ -281,10 +281,11 @@ INSERT INTO `translation_strings` (`keyword`, `fr`, `en`) VALUES
 ('compile_expected_identifier', 'identifiant attendu', 'identifier expected'),
 ('compile_fopen_pointer_error', 'L''ouverture d''un fichier en écriture sur le disque n''a pu être faite. Contactez la personne en charge de la console EasyDev.', 'A file opening on disc for writing was aborted. Contact the person in charge of the EasyDev console.'),
 ('compile_identifier_error', 'Identifiant non permis : ', 'Not-allowed identifier encountered : '),
+('compile_mysql_reserved_token_error', 'Un ou plusieurs identifiant rencontré fait partie de la liste des mots réservés pour MySQL (http://dev.mysql.com/doc/refman/5.1/en/reserved-words.html). Veuillez supprimer ces mots de votre compilation.', 'One or more identifiers are MySQL reserved words (http://dev.mysql.com/doc/refman/5.1/en/reserved-words.html). Please remove any of these words from your compilation.'),
 ('compile_no_class_def_found_error', 'Aucune définition de classe n''a été trouvée.', 'No class definition found.'),
 ('compile_no_field_def_found_error', 'Cette classe ne contient pas de définition de champs :', 'This class do not contains any field definition : '),
 ('compile_relationnm_not_recursive_error', 'Cette relation n''a pas pu être identifiée réciproquement dans l''objet distant : ', 'This relation could not be verified in the foreign object : '),
-('compile_relation_unknown_object_error', 'Une relation avec un objet non-défini a été détectée.', 'A relation with an undefined object has been detected.'),
+('compile_relation_unknown_object_error', 'L''objet cible n''a pas été trouvé pour la relation : ', 'The relation target object has not been found for : '),
 ('compile_self_relation_error', 'Aucune relation n''est permise avec l''objet dans lequel est définie la relation.', 'No relation is allowed with the object in which the relation is defined.'),
 ('compile_token_mismatch_error', 'Token inattendu rencontré.', 'Unexpected token error.'),
 ('compile_unexpected_token_error', 'Un token inattendu a été rencontré en fin de définition d''objet : ', 'An unexpected token has been encountered at the end of a class definition : '),
@@ -332,16 +333,25 @@ INSERT INTO `translation_strings` (`keyword`, `fr`, `en`) VALUES
 ('default_language', 'langue par défaut', 'default language'),
 ('delete', 'supprimer', 'delete'),
 ('expected', 'attendu', 'expected'),
+('filter', 'filtrer', 'filter'),
 ('found', 'trouvé', 'found'),
 ('generator_add_object_boolean_unset', 'Valeur booléenne (vrai ou faux) attendue pour le champs : ', 'Boolean value (true or false) expected for field : '),
+('generator_add_object_date_format_error', 'Le format de la date est incorrect. Veuillez insérer une date au format aaaa-mm-jj ou utilisez le calendrier visuel pour le champ : ', 'Date format is incorrect. Please enter date in yyyy-mm-dd format or use the visual calendar for the field : '),
 ('generator_add_object_expected_double', 'Valeur numérique attendue pour le champs : ', 'Numeric value expected for field : '),
 ('generator_add_object_expected_integer', 'Valeur numérique entière attendue pour le champs : ', 'Numeric value expected for field : '),
+('generator_add_object_hour_format_error', 'Veuillez sélectionner une heure pour le champ : ', 'Please insert an hour value for the field : '),
 ('generator_add_object_image_no_file', 'Un fichier de type image doit être insérer.', 'Please insert an image file.'),
+('generator_add_object_mins_format_error', 'Veuillez insérer une valeur pour les minutes du champ : ', 'Please insert a value for the minutes of the field : '),
 ('generator_add_page_submit_button', 'Ajouter', 'Add'),
 ('generator_add_page_title', 'Ajouter un objet dans la base de données', 'Add an object into the database'),
 ('generator_confirm_insert', 'L''objet a été correctement inséré dans la base de données.', 'The object has been successfully added to the database.'),
 ('generator_confirm_modify', 'Les changements pour l''objet ont été enregistrés correctement dans la base de données.', 'The modifications on the object has been successfully saved in database.'),
+('generator_delete_page_filter_title', 'Filtrer les objets par relation 1:N : ', 'Filter objects with the 1:N relations : '),
+('generator_delete_page_title', 'Liste des objets : ', 'List of the objects : '),
+('generator_modify_page_submit_button', 'Modifier', 'Modify'),
 ('generator_modify_page_title', 'Modifier un objet', 'Modify an object'),
+('generator_nm_rel_page_main_title', 'Choix de l''objet auquel modifier des relations', 'Choice of the target object for the relations modifications'),
+('generator_nm_rel_page_second_title', 'Modifications des relations sur l''objet sélectionné', 'Modifications on the relations of the selected object'),
 ('language', 'langue', 'language'),
 ('log_out', 'deconnexion', 'log out'),
 ('modify', 'modifier', 'modify'),

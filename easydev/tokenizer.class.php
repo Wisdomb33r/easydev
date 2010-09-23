@@ -31,8 +31,9 @@ class tokenizer{
   private function deleteAdditionalSpaces(){
 
 	// remove all end of lines and replace them by spaces 
-	// WARNING : \r\n is only for windows machines, set it to \n for unix machines
 	$this->userstring = str_replace("\r\n", ' ', $this->userstring);
+	$this->userstring = str_replace("\r", ' ', $this->userstring);
+	$this->userstring = str_replace("\n", ' ', $this->userstring);
 	
 	// remove all tabs and replace them by spaces
 	$this->userstring = str_replace("\t", ' ', $this->userstring);
@@ -67,6 +68,7 @@ class tokenizer{
 	$this->userstring = str_replace('.', ' . ', $this->userstring);
 	$this->userstring = str_replace('<', ' < ', $this->userstring);
 	$this->userstring = str_replace('>', ' > ', $this->userstring);
+	$this->userstring = str_replace('!', ' ! ', $this->userstring);
   }
 
   /*

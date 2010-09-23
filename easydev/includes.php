@@ -8,6 +8,25 @@ require_once('includes/field.class.php');
 require_once('includes/dbobject.class.php');
 
 session_start();
+
+function recursive_stripslashes($variable){
+	if(is_array($variable)){
+		foreach($variable as $key => $value){
+			$variable[$key] = recursive_stripslashes($value);
+		}
+	}
+	else{
+		return stripslashes($variable);
+	}
+}
+
+// handle the case when magic quotes are activated by removing all the backslashes in GPC
+if(get_magic_quotes_gpc()){
+	recursive_stripslashes($_POST);
+	recursive_stripslashes($_GET);
+	recursive_stripslashes($_COOKIE);
+}
+
 // change the language if the user wants to
 if(isset($_GET[SESSION_LANGUAGE])){
   $_SESSION[SESSION_LANGUAGE] = $_GET[SESSION_LANGUAGE];
@@ -42,7 +61,7 @@ else{ // user should not see the page, let's redirect on index.php where user ca
 
 // verify that user has permission to view the opened menu he wants to see
 if(isset($_GET[CURRENTMENU])){ // if the user wants to see the content of a menu
-  if(! $session_permissions[$_GET[CURRENTMENU]]){
+  if(! isset($session_permissions[$_GET[CURRENTMENU]])){
 	// we redirect on main.php which is the default console page (every one can see this one). This should happens only if user manipulates the GET URL
 	header('Location: main.php');
 	exit;

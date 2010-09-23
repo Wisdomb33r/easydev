@@ -45,7 +45,7 @@ else{ // if the user has the permissions
 	  
 	  // PHP redirection on this script to print errors
 	  // NOTE : this should not happens as we are compiling an already-compiled object
-	  header('Location: '.$_SERVER[PHP_SELF].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU]);
+	  header('Location: '.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU]);
 	  exit;
 	}
 	
@@ -62,7 +62,7 @@ else{ // if the user has the permissions
 	
 	  // PHP redirection on this script to print errors
 	  // NOTE : this should not happens as we are compiling an already-compiled object
-	  header('Location: '.$_SERVER[PHP_SELF].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU]);
+	  header('Location: '.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU]);
 	  exit;
 	}
 	
@@ -173,12 +173,12 @@ else{ // if the user has the permissions
 	  $_SESSION[SESSION_POSTED] = array();
 	  
 	  // PHP redirection on this script to print errors
-	  header('Location: '.$_SERVER[PHP_SELF].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU]);
+	  header('Location: '.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU]);
 	  exit;
 	}
 	
 	// now that the object is successfully generated, redirect on the main page
-	header('Location: '.$_SERVER[PHP_SELF].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'&action=confirmRegenerate');
+	header('Location: '.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'&action=confirmRegenerate');
 	exit;
 	
   }

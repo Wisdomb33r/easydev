@@ -60,7 +60,7 @@ class dbobject{
 		$ret .= '1n_rel_'.$field->options['relationname'].' int(10) unsigned NOT NULL,'."\n";
 		break;
 	  case 'string':
-		$ret .= $field->label.' varchar(100) collate latin1_german1_ci NULL,'."\n";
+		$ret .= $field->label.' varchar(255) collate latin1_german1_ci NULL,'."\n";
 		break;
 	  case 'bool':
 		$ret .= $field->label.' tinyint(1) NULL,'."\n";
@@ -125,7 +125,7 @@ class dbobject{
 		  // create the InnoDB relations
 		  $query = 'ALTER TABLE object_'.$field->label.'_'.$this->name.'_'.$field->options['relationname'].'_nmrelation'.
 			' ADD FOREIGN KEY (id_'.$field->label.')'.
-			' REFERENCES OBJECT_'.$field->label.' (id)'.
+			' REFERENCES object_'.$field->label.' (id)'.
 			' ON DELETE CASCADE ON UPDATE CASCADE;';
 		  array_push($return, $query);
 		  $query = 'ALTER TABLE object_'.$field->label.'_'.$this->name.'_'.$field->options['relationname'].'_nmrelation'.

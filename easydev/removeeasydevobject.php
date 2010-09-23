@@ -60,7 +60,7 @@ else{ // if the user has the permissions
 		unlink('objectnmrel_'.$obj2name.'_'.$obj1name.'_'.$line['relationname'].'.php');
 
 		// remove the table of the relation
-		$query = 'DROP TABLE '.$line['table_name'];
+		$query = 'DROP TABLE IF EXISTS '.$line['table_name'];
 		mysql_query($query) or die('Error while dropping object relation table.<br />'.$query);
 	  }
 
@@ -87,15 +87,15 @@ else{ // if the user has the permissions
 	  mysql_query($query) or die('Error while deleting main menu section.<br />'.$query);
 
 	  // remove the object table
-	  // WARNING : MySQL makes an AUTOCOMMIT when executing most of the statement that create, delete or alter tables.
+	  // WARNING : MySQL makes an AUTOCOMMIT when executing the statement that create, drop or alter tables.
 	  // Here the commit is done through the DROP TABLE statement.
-	  $query = 'DROP TABLE object_'.$objectname;
+	  $query = 'DROP TABLE IF EXISTS object_'.$objectname;
 	  mysql_query($query) or die('Error while dropping object table.<br />'.$query);
 
 	  // remove all the generated scripts
-	  unlink('objectadd_'.$objectname.'.php');
-	  unlink('objectdelete_'.$objectname.'.php');
-	  unlink('object_'.$objectname.'.class.php');
+	  if(file_exists('objectadd_'.$objectname.'.php')) unlink('objectadd_'.$objectname.'.php');
+	  if(file_exists('objectdelete_'.$objectname.'.php')) unlink('objectdelete_'.$objectname.'.php');
+	  if(file_exists('object_'.$objectname.'.class.php')) unlink('object_'.$objectname.'.class.php');
 
 	  // insert the log
 	  $today = date('Y-m-d H:i');
