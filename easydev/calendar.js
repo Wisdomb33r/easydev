@@ -29,7 +29,7 @@ function subrstr(str,nbr) {
 * @param string OPTIONAL     Optional layer name
 * @param string OPTIONAL     Optional images path
 */
-	function dynCalendar(objName, callbackFunc)
+	function dynCalendar(objName, callbackFunc, imagesPath)
 	{
 		/**
         * Properties
@@ -42,7 +42,7 @@ function subrstr(str,nbr) {
 
 		this.objName        = objName;
 		this.callbackFunc   = callbackFunc;
-		this.imagesPath     = '';
+		this.imagesPath     = imagesPath;
 		this.layerID        = arguments[3] ? arguments[3] : 'dynCalendar_layer_' + dynCalendar_layers.length;
 
 		this.offsetX        = 5;
@@ -70,6 +70,7 @@ function subrstr(str,nbr) {
 		this.setCurrentMonth   = dynCalendar_setCurrentMonth;
 		this.setCurrentYear    = dynCalendar_setCurrentYear;
 		this.setYearComboRange = dynCalendar_setYearComboRange;
+		this.setImagesPath     = dynCalendar_setImagesPath;
 
 		/**
         * Private methods
@@ -158,9 +159,9 @@ function subrstr(str,nbr) {
 			nextYear++;
 		}
 
-		prevImgHTML  = '<img src="prev.gif" alt="<<" border="0" />';
+		prevImgHTML  = '<img src="' + this.imagesPath + 'prev.gif" alt="<<" border="0" />';
 		prevLinkHTML = '<a href="javascript: ' + this.objName + '.show(' + thisMonth.getMonth() + ', ' + (thisMonth.getFullYear()-1) + ')">' + prevImgHTML + '</a>';
-		nextImgHTML  = '<img src="next.gif" alt=">>" border="0" />';
+		nextImgHTML  = '<img src="' + this.imagesPath + 'next.gif" alt=">>" border="0" />';
 		nextLinkHTML = '<a href="javascript: ' + this.objName + '.show(' + thisMonth.getMonth() + ', ' + (thisMonth.getFullYear()+1) + ')">' + nextImgHTML + '</a>';
 
 		/**
@@ -219,7 +220,7 @@ function subrstr(str,nbr) {
 	function dynCalendar_writeHTML()
 	{
 		if (is_ie5up || is_nav6up || is_gecko) {
-			document.write('<a href="javascript: ' + this.objName + '.show()"><img src="' + this.imagesPath + 'calendar.gif" border="0" /></a>');
+			document.write('<a href="javascript: ' + this.objName + '.show()"><img src="' + this.imagesPath + 'calendar.gif" border="0" style="margin-bottom: -3px;" /></a>');
 			document.write('<div class="dynCalendar" id="' + this.layerID + '" onmouseover="' + this.objName + '._mouseover(true)" onmouseout="' + this.objName + '._mouseover(false)"></div>');
 		}
 	}
@@ -321,6 +322,13 @@ function subrstr(str,nbr) {
 	function dynCalendar_setYearComboRange(range)
 	{
 		this.yearComboRange = range;
+	}
+	
+/**
+ * Sets the Image Path
+ */
+	function dynCalendar_setImagesPath(path){
+		this.imagesPath = path;
 	}
 
 /**

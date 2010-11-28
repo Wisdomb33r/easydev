@@ -11,7 +11,7 @@ $adminMainMenu = CONFIG_MENU_ID;
 
 // verify that the logged user has right to see this page
 if(! $session_permissions[$adminMainMenu]){ // the user should not see this page because he do not has rights
-  header('Location: main.php');
+  header('Location: '.CONSOLE_PATH.'index.php');
   exit;
 }
 else{ // if the user has the permissions
@@ -20,7 +20,7 @@ else{ // if the user has the permissions
 	
 	// verify if the user has clicked on the "cancel" button
 	if(isset($_POST['cancel'])){
-	  header('Location: main.php?'.CURRENTMENU.'='.$_GET[CURRENTMENU]); // redirect on the main page
+	  header('Location: '.CONSOLE_PATH.'index.php?'.CURRENTMENU.'='.$_GET[CURRENTMENU]); // redirect on the main page
 	  exit;
 	}
 
@@ -42,7 +42,7 @@ else{ // if the user has the permissions
 	else{ // if there is no errors
 	  // store the admin in the database
 	  $query = 'UPDATE '.CONFIGURATION.' SET value="'.$_POST['default_language'].'" WHERE id="default_language"';
-	  mysql_query($query) or die('Error while updating default language.<br />'.$query);
+	  mysql_query($query) or die('Error while updating default language.');
 	  
 	  // redirect on the same page but with a message to say that config has been properly changed
 	  header('Location: '.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'&action=confirmConfigModif');
@@ -55,7 +55,7 @@ else{ // if the user has the permissions
 
 	// verify if $_GET['action'] is set. If it is the case, need to print a message to indicate that the config was properly changed
 	if(isset($_GET['action']) && $_GET['action']=='confirmConfigModif'){
-	  echo '<p><strong>'.htmlentities($translator->translate('console_config_modif_confirmation')).'</strong></p>'."\n";
+	  echo '<p><strong>'.htmlentities(Translator::translate('console_config_modif_confirmation')).'</strong></p>'."\n";
 	}
 	/*
 	$name = '';
@@ -81,18 +81,18 @@ else{ // if the user has the permissions
 	  }*/
 	
 	// print the HTML form to configure the console
-	echo '<p class="largemargintop">'.htmlentities($translator->translate('console_config_modify_info')).'</p>'."\n"
+	echo '<p class="largemargintop">'.htmlentities(Translator::translate('console_config_modify_info')).'</p>'."\n"
 	  .'<form action="config.php?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'" method="post">'."\n"
 	  .'<table class="form">'."\n"
 	  .'  <tr>'."\n"
-	  .'    <td>'.htmlentities($translator->translate('default_language')).' : </td>'."\n"
+	  .'    <td>'.htmlentities(Translator::translate('default_language')).' : </td>'."\n"
 	  .'    <td><select class="selectinput" name="default_language">'."\n";
 	$query = 'SELECT value FROM '.CONFIGURATION.' WHERE id="default_language"';
-	$result = mysql_query($query) or die('Error while selecting default language configuration.<br />'.$query);
+	$result = mysql_query($query) or die('Error while selecting default language configuration.');
 	$row = mysql_fetch_array($result);
 
 	$query = 'SELECT language, tag FROM '.TRANSLATION_LANGUAGES;
-	$result = mysql_query($query) or die('Error while selecting language list.<br />'.$query);
+	$result = mysql_query($query) or die('Error while selecting language list.');
 	while($line = mysql_fetch_array($result)){
 	  echo '      <option value="'.$line['tag'].'"'.($line['tag'] == $row['value'] ? ' selected="selected"' : '').'>'.$line['language'].'</option>'."\n";
 	}
@@ -100,8 +100,8 @@ else{ // if the user has the permissions
 	  .'  </tr>'."\n"
 	  .'  <tr>'."\n"
 	  .'    <td>&nbsp;</td>'."\n"
-	  .'    <td><input class="bouton" type="submit" name="add" value="'.htmlentities($translator->translate('submit')).'" />'."\n"
-	  .'        <input class="bouton" type="submit" name="cancel" value="'.htmlentities($translator->translate('cancel')).'" /></td>'."\n"
+	  .'    <td><input class="bouton" type="submit" name="add" value="'.htmlentities(Translator::translate('submit')).'" />'."\n"
+	  .'        <input class="bouton" type="submit" name="cancel" value="'.htmlentities(Translator::translate('cancel')).'" /></td>'."\n"
 	  .'  </tr>'."\n"
 	  .'</table>'."\n"
 	  .'</form>'."\n";

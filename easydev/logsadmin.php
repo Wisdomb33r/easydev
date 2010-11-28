@@ -11,7 +11,7 @@ $adminMainMenu = LOG_MENU_ID;
 
 // verify that the logged user has right to see this page
 if(! $session_permissions[$adminMainMenu]){ // the user should not see this page because he do not has rights
-  header('Location: main.php');
+  header('Location: '.CONSOLE_PATH.'index.php');
   exit;
 }
 else{ // if the user has the permissions
@@ -20,7 +20,7 @@ else{ // if the user has the permissions
   include 'adminheader.php';
 
   $query = 'SELECT log FROM '.LOGS.' ORDER BY id DESC LIMIT 0, 200';
-  $result = mysql_query($query) or die('Error while selecting administrator logs.<br />'.$query);
+  $result = mysql_query($query) or die('Error while selecting administrator logs.');
 
   while ($line = mysql_fetch_array($result)){
 	echo '<p>'.$line['log'].'</p>';

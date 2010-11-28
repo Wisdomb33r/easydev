@@ -3,16 +3,14 @@
  *
  */
 class dbobject{
-  var $name; // the name of the object
-  var $fieldlist; // the different fields of the object
-  var $usertextdef; // the textual definition that user entered
-  var $translator; // the translator
+  protected $name; // the name of the object
+  protected $fieldlist; // the different fields of the object
+  protected $usertextdef; // the textual definition that user entered
 
-  function __construct($name, $fieldlist, $usertextdef, $translator){
+  function __construct($name, $fieldlist, $usertextdef){
 	$this->name = $name;
 	$this->fieldlist = $fieldlist;
 	$this->usertextdef = $usertextdef;
-	$this->translator = $translator;
   }
 
   /* Getter for the differents attributes.
@@ -57,7 +55,7 @@ class dbobject{
 		// nothing to add, it is in a separate table
 		break;
 	  case 'relation1N':
-		$ret .= '1n_rel_'.$field->options['relationname'].' int(10) unsigned NOT NULL,'."\n";
+		$ret .= '1n_rel_'.$field->options['relationname'].' int(10) unsigned '.(isset($field->options['nullable']) && $field->options['nullable'] ? '' : 'NOT').' NULL,'."\n";
 		break;
 	  case 'string':
 		$ret .= $field->label.' varchar(255) collate latin1_german1_ci NULL,'."\n";
@@ -75,15 +73,19 @@ class dbobject{
 		$ret .= $field->label.' text collate latin1_german1_ci NULL,'."\n";
 		break;
 	  case 'image':
-		$ret .= $field->label.' longblob NULL,'."\n";
-		$ret .= $field->label.'_type tinyint(1) NULL,'."\n";
+	  	$ret .= $field->label.' varchar(20) NULL,'."\n";
 		break;
+	  case 'file':
+	  	$ret .= $field->label.' varchar(255) NULL,'."\n";
+	  	break;
 	  case 'date':
 		$ret .= $field->label.' date NULL,'."\n";
 		break;
 	  case 'datetime':
 		$ret .= $field->label.' datetime NULL,'."\n";
 		break;
+	  case 'password':
+	  	$ret .= $field->label.' varchar(40),'."\n";
 	  case 'finder':
 	  case 'updater':
 		break; // these two cases have impact only on the class object generation
@@ -210,18 +212,21 @@ class dbobject{
 
   /* Create a PHP class definition for the current object.
    */
-  public function createObjectClass(){
-	$script = $this->useTemplate('objectclass.tpl');
+  public function createObjectClass($foreignobjectlist){
+  	$predefinedvariables = array();
+  	$predefinedvariables['foreignobjectlist'] = $foreignobjectlist;
+	$script = $this->useTemplate('objectclass.tpl', $predefinedvariables, false);
 	return $script;
   }
 
   /* Return the html/php code for the delete pages
    * @param integer $mainmenuid the id of the console main menu the script is part of
    */ 
-  public function htmlDeleterGenerator($mainmenuid){
+  public function htmlDeleterGenerator($mainmenuid, $foreignobjectlist){
 	$predefinedvariables = array();
 	$predefinedvariables['mainmenuid'] = $mainmenuid;
-	$script = $this->useTemplate('objectdelete.tpl', $predefinedvariables);
+	$predefinedvariables['foreignobjectlist'] = $foreignobjectlist;
+	$script = $this->useTemplate('objectdelete.tpl', $predefinedvariables, false);
 	return $script;
   }
 

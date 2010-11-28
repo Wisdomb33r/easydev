@@ -155,9 +155,10 @@ table.form tr{
 }
 
 ul.errors{
-	margin-left: 50px;
+	margin-left: 20px;
 	list-style-type: none;
 	margin-top: 20px;
+	padding: 0;
 }
 
 li.errors{
@@ -212,8 +213,10 @@ td.objectmodifyname{
 }
 
 .easydevform input[type="checkbox"]{
-	margin-top: 0px;
-	margin-bottom : 0px;
+	margin-top: 3px;
+	margin-bottom : 0;
+	margin-left: 0;
+	margin-right: 3px;
 }
 
 .easydevform input[type="password"]{
@@ -226,6 +229,7 @@ td.objectmodifyname{
 	font-size: 8pt;
 	border: 1px solid #AAAAAA;
 	width: 250px;
+	margin-top: 2px;
 }
 
 .easydevform textarea{
