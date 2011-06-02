@@ -63,7 +63,12 @@ if(isset($_SESSION[SESSION_LOGIN])){ // if there is a user login in the session
 	}
 }
 else{ // user should not see the page, let's print the login form
-	include 'includes/loginbox.php';
+	if($_SERVER['REQUEST_URI'] == CONSOLE_PATH.'index.php'){
+		include 'includes/loginbox.php';
+	}
+	else{
+		header('Location: '.CONSOLE_PATH.'index.php');
+	}
 	exit();
 }
 

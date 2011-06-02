@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- Host: localhost
--- Generation Time: Nov 28, 2010 at 12:19 PM
+-- Generation Time: Jun 02, 2011 at 12:19 PM
 -- Server version: 5.0.41
 -- PHP Version: 5.2.3
 
@@ -106,7 +106,7 @@ CREATE TABLE `configuration` (
 
 INSERT INTO `configuration` (`id`, `value`) VALUES 
 ('default_language', 'fr'),
-('version', '2.0');
+('version', '2.1');
 
 -- --------------------------------------------------------
 
@@ -143,23 +143,6 @@ CREATE TABLE `easydev_objects_foreign_key` (
 
 -- 
 -- Dumping data for table `easydev_objects_foreign_key`
--- 
-
-
--- --------------------------------------------------------
-
--- 
--- Table structure for table `easydev_objects_image_scripts`
--- 
-
-CREATE TABLE `easydev_objects_image_scripts` (
-  `id_object` int(10) unsigned NOT NULL,
-  `field_name` varchar(255) collate latin1_german1_ci NOT NULL,
-  PRIMARY KEY  (`id_object`,`field_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci;
-
--- 
--- Dumping data for table `easydev_objects_image_scripts`
 -- 
 
 
@@ -411,12 +394,6 @@ ALTER TABLE `easydev_objects`
 ALTER TABLE `easydev_objects_foreign_key`
   ADD CONSTRAINT `easydev_objects_foreign_key_ibfk_1` FOREIGN KEY (`id_object`) REFERENCES `easydev_objects` (`id_mainmenu`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `easydev_objects_foreign_key_ibfk_2` FOREIGN KEY (`id_foreign_object`) REFERENCES `easydev_objects` (`id_mainmenu`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- 
--- Constraints for table `easydev_objects_image_scripts`
--- 
-ALTER TABLE `easydev_objects_image_scripts`
-  ADD CONSTRAINT `easydev_objects_image_scripts_ibfk_1` FOREIGN KEY (`id_object`) REFERENCES `easydev_objects` (`id_mainmenu`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- 
 -- Constraints for table `easydev_objects_linking_tables`

@@ -96,7 +96,7 @@ foreach($obj->fieldlist as $field){
     echo '    <td>'.$object-><% echo $field->label;%>.'</td>'."\n";<%
     break;
   case 'image':%>
-    echo '    <td><img src="object_image_<% echo $this->name; %>_<% echo $field->label; %>.php?id='.$object->id.'" width="50" /></td>'."\n";<%
+    echo '    <td><img src="'.$object->getImage<% echo $field->label;%>Path(50).'" width="50" /></td>'."\n";<%
     break;
   }
 }
@@ -146,7 +146,7 @@ foreach($obj->fieldlist as $field){
     echo '    <td>'.$object-><% echo $field->label;%>.'</td>'."\n";<%
     break;
   case 'image':%>
-    echo '    <td><img src="object_image_<% echo $this->name; %>_<% echo $field->label; %>.php?id='.$object->id.'&amp;width=50" /></td>'."\n";<%
+    echo '    <td><img src="'.$object->getImage<% echo $field->label;%>Path(50).'" width="50" /></td>'."\n";<%
     break;
   }
 }

@@ -42,8 +42,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){// if server method request == POST
 else{ // if the request_method == GET<%
 foreach($this->fieldlist as $field){
   if($field->type == 'image'){%>
-  if(isset($_GET['action']) && $_GET['action'] == 'view<% echo $this->name.$field->label;%>' && isset($_GET['id'])){
-    echo '<html><head><link rel=stylesheet href="'.CONSOLE_PATH.'adminstyle.css" type="text/css"></head><body>'."\n".'<p class="center"><img src="object_image_<% echo $this->name;%>_<% echo $field->label; %>.php?id='.$_GET['id'].'" />'."\n".'<br /><a class="default" href="'.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'">'.Translator::translate('back_to_list_page').'</a></p>'."\n".'</body></html>';
+  if(isset($_GET['action']) && $_GET['action'] == 'view<% echo $this->name.$field->label;%>' && isset($_GET['id']) && ($objectToView = <% echo $this->name;%>::findByPrimaryId($_GET['id']))){
+    echo '<html><head><link rel=stylesheet href="'.CONSOLE_PATH.'adminstyle.css" type="text/css"></head><body>'."\n".'<p class="center"><img src="'.$objectToView->getImage<% echo $field->label;%>Path().'" />'."\n".'<br /><a class="default" href="'.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'">'.Translator::translate('back_to_list_page').'</a></p>'."\n".'</body></html>';
     exit();
   }<%
   }
@@ -209,7 +209,7 @@ foreach($this->fieldlist as $field){
     $printedfieldcounter++;
     break;
   case 'image':%>
-    echo '    <td><a href="'.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.(isset($_GET[CURRENTMENU]) ? $_GET[CURRENTMENU] : '').'&amp;action=view<% echo $this->name.$field->label; %>&amp;id='.$object->id.'"><img src="object_image_<% echo $this->name;%>_<% echo $field->label;%>.php?id='.$object->id.'&amp;width=50" /></a></td>';<%
+    echo '    <td><a href="'.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.(isset($_GET[CURRENTMENU]) ? $_GET[CURRENTMENU] : '').'&amp;action=view<% echo $this->name.$field->label; %>&amp;id='.$object->id.'"><img src="'.$object->getImage<% echo $field->label;%>Path(50).'" /></a></td>';<%
     $printedfieldcounter++;
     break;
   case 'file':%>

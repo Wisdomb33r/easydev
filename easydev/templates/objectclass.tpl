@@ -5,9 +5,9 @@
  * Any modification of this code may alter the behaviour of EasyDev 2.x console
  ********************************************************************************/
 
-require_once '../includes/connection.php';
-require_once '../includes/constants.php';
-require_once '../includes/translator.class.php';<% 
+require_once dirname(__FILE__).'/../includes/connection.php';
+require_once dirname(__FILE__).'/../includes/constants.php';
+require_once dirname(__FILE__).'/../includes/translator.class.php';<% 
 foreach($this->fieldlist as $field){
   if($field->type == 'relation1N' || $field->type == 'relationNM'){%>
 require_once 'object_<% echo $field->label; %>.class.php';<%
@@ -338,7 +338,7 @@ foreach($this->fieldlist as $field){
   	break;
   case 'relation1N': 
   	if(!isset($field->options['nullable']) || ! $field->options['nullable']){%>
-    if($this->relation1N<% echo $field->options['relationname']; %> == null) die('EasyDev FATAL ERROR - Trying to store an object before setting a relation 1:N');<%
+    if($this->relation1N<% echo $field->options['relationname']; %> == null || ! ($foreignobject = <% echo $field->label; %>::findByPrimaryId($this->relation1N<% echo $field->options['relationname']; %>))) $this->errors[] = Translator::translate('generator_add_object_relation1N_unset_error').'<% echo $field->options['relationname']; %>';<%
   	}
   	break;
   default:
@@ -352,8 +352,8 @@ foreach($this->fieldlist as $field){
    * The object is inserted if the primary id is equal to zero (zero init is done by the constructor), 
    * or updated if the primary id is not equal to zero (non-zero init is done by the finders).
    */
-  public function store(){
-  	if($this->verifyValues()){
+  public function store($validatefunction = 'verifyValues'){
+  	if($this->$validatefunction()){
   	  mysql_query('START TRANSACTION');
       $query = '';
       if(!isset($this->id)){
@@ -524,8 +524,18 @@ foreach($this->fieldlist as $field){
         $paddedIdentifier = str_pad($this->id, 9, '0', STR_PAD_LEFT);
         $d1 = substr($paddedIdentifier, 0, 3);
         $d2 = substr($paddedIdentifier, 3, 3);
-        $directory = '../resources/<% echo $this->name; %>/<% echo $field->label; %>/'.$d1.'/'.$d2.'/native/';
-        if(!file_exists($directory)) mkdir($directory, 770, true);
+        $directory_prefix = dirname(__FILE__).'/../';
+        $directory = 'resources/<% echo $this->name; %>/<% echo $field->label; %>/'.$d1.'/'.$d2.'/native/';
+        if(!file_exists($directory_prefix.$directory)){
+          $tested_dir = $directory_prefix;
+          $exploded = explode('/', $directory);
+          for($i = 0;$i < (count($exploded) - 1); $i++){
+            if(!file_exists($tested_dir.$exploded[$i])){
+              mkdir($tested_dir.$exploded[$i], 0777);
+            }
+            $tested_dir .= $exploded[$i].'/';
+          }
+        }
         $imageinfos = getimagesize($this-><% echo $field->label; %>_server_temp_file);
         if(is_array($imageinfos) && count($imageinfos)){
           $filename = substr($paddedIdentifier, 6, 3).'_'.substr(md5(time().$this->id), 0, 6).'.';
@@ -543,7 +553,7 @@ foreach($this->fieldlist as $field){
               die('wrong image type');
               break;
           }
-          move_uploaded_file($this-><% echo $field->label; %>_server_temp_file, $directory.$filename);
+          move_uploaded_file($this-><% echo $field->label; %>_server_temp_file, $directory_prefix.$directory.$filename);
           $this-><% echo $field->label; %>_server_temp_file = '';
           $this-><% echo $field->label; %> = $filename;
           mysql_query('UPDATE object_<% echo $this->name; %> SET <% echo $field->label; %>="'.$filename.'" WHERE id="'.$this->id.'"') or die('Error while updating image filename.');
@@ -564,11 +574,21 @@ foreach($this->fieldlist as $field){
         $paddedIdentifier = str_pad($this->id, 9, '0', STR_PAD_LEFT);
         $d1 = substr($paddedIdentifier, 0, 3);
         $d2 = substr($paddedIdentifier, 3, 3);
-        $directory = '../resources/<% echo $this->name; %>/<% echo $field->label; %>/'.$d1.'/'.$d2.'/';
+        $directory_prefix = dirname(__FILE__).'/../';
+        $directory = 'resources/<% echo $this->name; %>/<% echo $field->label; %>/'.$d1.'/'.$d2.'/native/';
         $filename = substr($paddedIdentifier, 6, 3).'_'.substr(md5(time().$this->id), 0, 6).'.'.$this-><% echo $field->label; %>_temp_file_extension;
-        $filepath = str_replace('..', CONSOLE_PATH, $directory).$filename;
-        if(!file_exists($directory)) mkdir($directory, 770, true);
-        move_uploaded_file($this-><% echo $field->label; %>_server_temp_file, $directory.$filename);
+        $filepath = CONSOLE_PATH.$directory.$filename;
+        if(!file_exists($directory_prefix.$directory)){
+          $tested_dir = $directory_prefix;
+          $exploded = explode('/', $directory);
+          for($i = 0;$i < (count($exploded) - 1); $i++){
+            if(!file_exists($tested_dir.$exploded[$i])){
+              mkdir($tested_dir.$exploded[$i], 0777);
+            }
+            $tested_dir .= $exploded[$i].'/';
+          }
+        }
+        move_uploaded_file($this-><% echo $field->label; %>_server_temp_file, $directory_prefix.$directory.$filename);
         $this-><% echo $field->label; %>_server_temp_file = '';
         $this-><% echo $field->label; %> = $filepath;
         mysql_query('UPDATE object_<% echo $this->name; %> SET <% echo $field->label; %>="'.$filepath.'" WHERE id="'.$this->id.'"') or die('Error while updating image filename.');
@@ -587,23 +607,27 @@ foreach($this->fieldlist as $field){
              'WHERE id_<% echo $this->name; %>="'.$this->id.'"';
       mysql_query($query) or die('Error while deleting relations N:M in second object.');
 
-    foreach($this->relationNM<% echo $field->options['relationname']; %> as $newlink){
-        $query = 'INSERT INTO object_<% echo $field->label; %>_<% echo $this->name; %>_<% echo $field->options['relationname']; %>_nmrelation '.
-               '(id_<% echo $field->label; %>, id_<% echo $this->name; %>) '.
-               'VALUES ("'.$newlink.'", "'.$this->id.'")';
-        mysql_query($query) or die('Error while inserting relations N:M in second object.');
-    }
+      if($this->relationNM<% echo $field->options['relationname']; %> && count($this->relationNM<% echo $field->options['relationname']; %>)){
+        foreach($this->relationNM<% echo $field->options['relationname']; %> as $newlink){
+          $query = 'INSERT INTO object_<% echo $field->label; %>_<% echo $this->name; %>_<% echo $field->options['relationname']; %>_nmrelation '.
+                   '(id_<% echo $field->label; %>, id_<% echo $this->name; %>) '.
+                   'VALUES ("'.$newlink.'", "'.$this->id.'")';
+          mysql_query($query) or die('Error while inserting relations N:M in second object.');
+        }
+      }
 <%  }
     else{
 %>      $query = 'DELETE FROM object_<% echo $this->name; %>_<% echo $field->label; %>_<% echo $field->options['relationname']; %>_nmrelation '.
              'WHERE id_<% echo $this->name; %>="'.$this->id.'"';
       mysql_query($query) or die('Error while deleting relations N:M in first object.');
 
-      foreach($this->relationNM<% echo $field->options['relationname']; %> as $newlink){
-        $query = 'INSERT INTO object_<% echo $this->name; %>_<% echo $field->label; %>_<% echo $field->options['relationname']; %>_nmrelation '.
-               '(id_<% echo $this->name; %>, id_<% echo $field->label; %>) '.
-               'VALUES ("'.$this->id.'", "'.$newlink.'")';
-        mysql_query($query) or die('Error while inserting relations N:M in first object.');
+      if($this->relationNM<% echo $field->options['relationname']; %> && count($this->relationNM<% echo $field->options['relationname']; %>)){
+        foreach($this->relationNM<% echo $field->options['relationname']; %> as $newlink){
+          $query = 'INSERT INTO object_<% echo $this->name; %>_<% echo $field->label; %>_<% echo $field->options['relationname']; %>_nmrelation '.
+                   '(id_<% echo $this->name; %>, id_<% echo $field->label; %>) '.
+                   'VALUES ("'.$this->id.'", "'.$newlink.'")';
+          mysql_query($query) or die('Error while inserting relations N:M in first object.');
+        }
       }
 <%  }
   }
@@ -622,11 +646,11 @@ foreach($this->fieldlist as $field){
     /**
      * Delete the images from disk for this object.
      */
-	private function removeImage<% echo $field->label; %>(){
+	protected function removeImage<% echo $field->label; %>(){
       $paddedIdentifier = str_pad($this->id, 9, '0', STR_PAD_LEFT);
       $d1 = substr($paddedIdentifier, 0, 3);
       $d2 = substr($paddedIdentifier, 3, 3);
-      $directory = '../resources/<% echo $this->name; %>/<% echo $field->label; %>/'.$d1.'/'.$d2.'/';
+      $directory = dirname(__FILE__).'/../resources/<% echo $this->name; %>/<% echo $field->label; %>/'.$d1.'/'.$d2.'/';
   	  if(file_exists($directory)){
         $dir = dir($directory);
         while (false !== ($entry = $dir->read())) {
@@ -643,11 +667,89 @@ foreach($this->fieldlist as $field){
 
 <%
 foreach($this->fieldlist as $field){
+	if($field->type == 'image'){%>	
+    /**
+     * Get the path of the image, and if it do not exists on disk, resize it to the whished width.
+     */
+    public function getImage<% echo $field->label; %>Path($width = null){
+      $paddedIdentifier = str_pad($this->id, 9, '0', STR_PAD_LEFT);
+      $d1 = substr($paddedIdentifier, 0, 3);
+      $d2 = substr($paddedIdentifier, 3, 3);
+      $directory_prefix = dirname(__FILE__).'/../';
+      $basedirectory = 'resources/<% echo $this->name; %>/<% echo $field->label; %>/'.$d1.'/'.$d2.'/';
+      if(file_exists($directory_prefix.$basedirectory)){ // first requirement, the directory for the image should exists, otherwise there is a major problem
+        $nativedirectory = $directory_prefix.$basedirectory.'native/'; // directory with the original file
+        // if the user wants the image in a specific width, and this width satisfies some requirements
+        if($width != null && $width > 0){
+          $destinationdirectory = $directory_prefix.$basedirectory.$width.'/'; // the directory where the files will go after resize
+          if(!file_exists($destinationdirectory)){ // if the destination directory does not exists
+            mkdir($destinationdirectory, 0777); // create the directory needed for the new width
+          }
+          // now destinationdirectory must exist
+          if(!file_exists($destinationdirectory.$this-><% echo $field->label; %>)){ // if the image file do not exist
+            if(file_exists($nativedirectory.$this-><% echo $field->label; %>)){
+              // resize the file from the nativedirectory and save it to destination directory
+              $imageinfos = getimagesize($nativedirectory.$this-><% echo $field->label; %>);
+              $resource = null;
+              $w = $imageinfos[0];
+              $h = $imageinfos[1];
+              switch($imageinfos[2]){
+                case IMAGETYPE_JPEG:
+                  $resource = imagecreatefromjpeg($nativedirectory.$this-><% echo $field->label; %>);
+                  break;
+                case IMAGETYPE_PNG:
+                  $resource = imagecreatefrompng($nativedirectory.$this-><% echo $field->label; %>);
+                  break;
+                case IMAGETYPE_GIF:
+                  $resource = imagecreatefromgif($nativedirectory.$this-><% echo $field->label; %>);
+                  break;
+                default:
+                  return '';
+                  break;
+              }
+              $newwidth = $width;
+              $newheight = $newwidth * $h / $w;
+              if($resource){
+                $resizedresource = imagecreatetruecolor($newwidth, $newheight);
+                $status = imagecopyresampled($resizedresource, $resource, 0, 0, 0, 0, $newwidth, $newheight, $w, $h);
+                if($status){
+                  switch($imageinfos[2]){
+                    case IMAGETYPE_GIF:
+                      imagegif($resizedresource, $destinationdirectory.$this-><% echo $field->label; %>);
+                      chmod($destinationdirectory.$this-><% echo $field->label; %>, 0664);
+                      break;
+                    case IMAGETYPE_JPEG:
+                      imagejpeg($resizedresource, $destinationdirectory.$this-><% echo $field->label; %>, 95);
+                      chmod($destinationdirectory.$this-><% echo $field->label; %>, 0664);
+                      break;
+                    case IMAGETYPE_PNG:
+                      imagepng($resizedresource, $destinationdirectory.$this-><% echo $field->label; %>, 2);
+                      chmod($destinationdirectory.$this-><% echo $field->label; %>, 0664);
+                      break;
+                  }
+                } else return '';
+              } else return '';
+            } else return '';
+          }
+          // return the image path
+          return CONSOLE_PATH.$basedirectory.$width.'/'.$this-><% echo $field->label; %>;
+        }
+        else{ // $width is not specified or null
+          // return the native path
+          return CONSOLE_PATH.$basedirectory.'native/'.$this-><% echo $field->label; %>;
+        }
+      }
+    }<%
+	}
+}%>
+
+<%
+foreach($this->fieldlist as $field){
 	if($field->type == 'file'){%>	
     /**
      * Delete the images from disk for this object.
      */
-	private function removeFile<% echo $field->label; %>(){
+	protected function removeFile<% echo $field->label; %>(){
 	  if($this-><% echo $field->label; %>){
 	    $relativefilepath = str_replace(CONSOLE_PATH, '..', $this-><% echo $field->label; %>);
 	    if(file_exists($relativefilepath)){
@@ -910,7 +1012,7 @@ foreach($field->options['finderparameters'] as $param){
 %>){<%
 $userquery = $field->options['finderquery'];
 foreach($field->options['finderparameters'] as $param){
-  $userquery = str_replace($param, '"\'.$'.$param.'.\'"', $userquery);
+  $userquery = str_replace($param, '"\'.addslashes($'.$param.').\'"', $userquery);
 }
 %>
     $query = '<% echo $userquery; %>';
@@ -944,8 +1046,8 @@ foreach($this->fieldlist as $field){
               .'WHERE id_<% echo $this->name; %>="'.$row['id'].'"';<%
     }
     else{%>
-      $query = 'SELECT id_<% echo $this->name; %> FROM object_<% echo $this->name; %>_<% echo $field->label; %>_<% echo $field->options['relationname']; %>_nmrelation '
-              .'WHERE id_<% echo $field->label; %>="'.$row['id'].'"';<%
+      $query = 'SELECT id_<% echo $field->label; %> FROM object_<% echo $this->name; %>_<% echo $field->label; %>_<% echo $field->options['relationname']; %>_nmrelation '
+              .'WHERE id_<% echo $this->name; %>="'.$row['id'].'"';<%
     }%>
       $result2 = mysql_query($query) or die('Error while selecting N:M relations.');
 
@@ -1051,9 +1153,9 @@ foreach($this->fieldlist as $field){
     $ret .= '  <tr>'."\n";
     $ret .= '    <td><% echo $field->label;%> : </td>'."\n".<%
     if(isset($field->options['nullable']) && $field->options['nullable']){%>
-            '    <td>'.($postedobject != null && $postedobject->id && $postedobject-><% echo $field->label; %> ? '<img src="object_image_<% echo $this->name;%>_<% echo $field->label;%>.php?id='.$postedobject->id.'&amp;width=50" /><br /><input type="checkbox" name="<% echo $field->label; %>_delete_flag" value="1" /> '.Translator::translate('delete_image').'<br />' : '').'<input type="file" name="<% echo $field->label;%>">'."\n";<%
+            '    <td>'.($postedobject != null && $postedobject->id && $postedobject-><% echo $field->label; %> ? '<img src="'.$postedobject->getImage<% echo $field->label;%>Path(50).'" /><br /><input type="checkbox" name="<% echo $field->label; %>_delete_flag" value="1" /> '.Translator::translate('delete_image').'<br />' : '').'<input type="file" name="<% echo $field->label;%>">'."\n";<%
     }else{ %>
-            '    <td>'.($postedobject != null && $postedobject->id && $postedobject-><% echo $field->label; %> ? '<img src="object_image_<% echo $this->name;%>_<% echo $field->label;%>.php?id='.$postedobject->id.'&amp;width=50" /><br />' : '').'<input type="file" name="<% echo $field->label;%>">'."\n";<%
+            '    <td>'.($postedobject != null && $postedobject->id && $postedobject-><% echo $field->label; %> ? '<img src="'.$postedobject->getImage<% echo $field->label;%>Path(50).'" /><br />' : '').'<input type="file" name="<% echo $field->label;%>">'."\n";<%
     }%>
     $ret .= '  </tr>'."\n";<%
     break;
@@ -1186,7 +1288,7 @@ foreach($textfields as $textfield){
    * Verify that the file sent exists and initialize the temporary path and extension for the file.
    * @param string $name The name of the sent file.
    */
-  private function verifyFileFromForm($name){
+  protected function verifyFileFromForm($name){
     if(isset($_FILES[$name]) && $_FILES[$name]['error'] == 0){
     	$pointpos = strrpos($_FILES[$name]['name'], '.');
     	$lastpos = strlen($_FILES[$name]['name']) - 1;
@@ -1236,7 +1338,7 @@ foreach($textfields as $textfield){
   /* Verify that the file sent exists, that it is really an image, and initialize the temporary path of the file.
    * @param string $name The name of the sent file.
    */
-  private function verifyImageFromForm($name){
+  protected function verifyImageFromForm($name){
   	if(isset($_FILES[$name]) && $_FILES[$name]['error'] == 0){
   		$imageinfos = getimagesize($_FILES[$name]['tmp_name']);
   		if(is_array($imageinfos) && count($imageinfos)){

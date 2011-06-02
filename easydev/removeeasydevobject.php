@@ -73,15 +73,6 @@ else{ // if the user has the permissions
 	  $result = mysql_query($query) or die('Error while selecting object name.');
 	  $line = mysql_fetch_array($result);
 	  $objectname = $line['name'];
-
-	  // verify if there is any image script associated to this object
-	  $query = 'SELECT field_name FROM '.EASYDEV_OBJECTS_IMAGE_SCRIPTS.' WHERE id_object="'.$delete.'"';
-	  $resultis = mysql_query($query) or die('Error while selecting image scripts.');
-
-	  // remove the image script of the object
-	  while($line = mysql_fetch_array($resultis)){
-		unlink('genscripts/object_image_'.$objectname.'_'.$line['field_name'].'.php');
-	  }
 	  
 	  // verify if there was a directory with images for this object
 	  if(file_exists('resources/'.$objectname.'/')){

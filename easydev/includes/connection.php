@@ -7,7 +7,7 @@ $nom_de_base = 'easydev0';
 
 // Insert here the directory path on your server where the EasyDev console is installed without your domain name. 
 //For instance, enter /admin/console/ if the EasyDev console has its root on http://www.example.com/admin/console/
-define('CONSOLE_PATH', '/EasyDev/easydev2.0/');
+define('CONSOLE_PATH', '/EasyDev/easydev2.1/');
 
 // This parameter let you adjust the number of different sizes you want to allow for all objects fields of type "image".
 // The native size of the image count as one.

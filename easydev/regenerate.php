@@ -119,25 +119,6 @@ else{ // if the user has the permissions
 				} // end of if($field->type == 'relationNM')
 			} // end of foreach($dbobject->fieldlist as $field)
 
-			// for all images, write the scripts to get the images on disc
-			foreach($dbobject->fieldlist as $field){
-				if($field->type == 'image'){
-					$scriptcode = $dbobject->imageScriptGenerator($field->label);
-
-					$filepointer = fopen('genscripts/object_image_'.$dbobject->name.'_'.$field->label.'.php', 'w');
-					if(!$filepointer){
-						//$query = 'ROLLBACK';
-						//mysql_query($query) or die('Error while transaction rollback.');
-						array_push($errors, Translator::translate('compile_fopen_pointer_error'));
-						//$rolledback = true;
-					}
-					else{
-						fwrite($filepointer, $scriptcode);
-						fclose($filepointer);
-					}
-				} // end of if($field->type == 'image')
-			}// end of foreach($dbobject->fieldlist as $field)
-
 			//if(!$rolledback){ // if an NM relation did not make the process to ROLLBACK
 			// generate the add html/php page and write it in a file
 			$addPageCode = $dbobject->htmlAdderGenerator($mainmenuid);
