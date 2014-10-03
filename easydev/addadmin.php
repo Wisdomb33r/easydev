@@ -82,7 +82,7 @@ else{ // if the user has the permissions
 
 	// verify if $_GET['action'] is set. If it is the case, need to print a message to indicate that the admin was successfully entered in database.
 	if(isset($_GET['action']) && $_GET['action']=='confirmAdminAdd'){
-	  echo '<p><strong>'.htmlentities(Translator::translate('console_add_admin_confirmation')).'</strong></p>'."\n";
+	  echo '<p><strong>'.htmlentities(Translator::translate('console_add_admin_confirmation'), ENT_COMPAT, 'UTF-8').'</strong></p>'."\n";
 	}
 	
 	$name = '';
@@ -108,25 +108,25 @@ else{ // if the user has the permissions
 	}
 	
 	// print the HTML form to add an administrator in the database
-	echo '<p class="largemargintop">'.htmlentities(Translator::translate('console_add_admin_header')).'</p>'."\n"
+	echo '<p class="largemargintop">'.htmlentities(Translator::translate('console_add_admin_header'), ENT_COMPAT, 'UTF-8').'</p>'."\n"
 	  .'<form action="addadmin.php?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'" method="post">'."\n"
 	  .'<table class="form">'."\n"
 	  .'  <tr>'."\n"
-	  .'    <td>'.htmlentities(Translator::translate('name')).' : </td>'."\n"
-	  .'    <td><input class="textinput" type="text" name="Name" maxlength="50" '.($name != '' ? 'value="'.htmlentities(stripslashes($name)).'" ' : '').'/></td>'."\n"
+	  .'    <td>'.htmlentities(Translator::translate('name'), ENT_COMPAT, 'UTF-8').' : </td>'."\n"
+	  .'    <td><input class="textinput" type="text" name="Name" maxlength="50" '.($name != '' ? 'value="'.htmlentities(stripslashes($name), ENT_COMPAT, 'UTF-8').'" ' : '').'/></td>'."\n"
 	  .'  </tr>'."\n"
 	  .'  <tr>'."\n"
-	  .'    <td>'.htmlentities(Translator::translate('password')).' : </td>'."\n"
+	  .'    <td>'.htmlentities(Translator::translate('password'), ENT_COMPAT, 'UTF-8').' : </td>'."\n"
 	  .'    <td><input class="passwordinput" type="password" name="Pass" maxlength="20" /></td>'."\n"
 	  .'  </tr>'."\n"
 	  .'  <tr>'."\n"
-	  .'    <td>'.htmlentities(Translator::translate('password_confirmation')).' : </td>'."\n"
+	  .'    <td>'.htmlentities(Translator::translate('password_confirmation'), ENT_COMPAT, 'UTF-8').' : </td>'."\n"
 	  .'    <td><input class="passwordinput" type="password" name="PassConfirmation" maxlength="20" /></td>'."\n"
 	  .'  </tr>'."\n"
 	  .'  <tr>'."\n"
 	  .'    <td>&nbsp;</td>'."\n"
-	  .'    <td><input class="bouton" type="submit" name="add" value="'.htmlentities(Translator::translate('add')).'" />'."\n"
-	  .'        <input class="bouton" type="submit" name="cancel" value="'.htmlentities(Translator::translate('cancel')).'" /></td>'."\n"
+	  .'    <td><input class="bouton" type="submit" name="add" value="'.htmlentities(Translator::translate('add'), ENT_COMPAT, 'UTF-8').'" />'."\n"
+	  .'        <input class="bouton" type="submit" name="cancel" value="'.htmlentities(Translator::translate('cancel'), ENT_COMPAT, 'UTF-8').'" /></td>'."\n"
 	  .'  </tr>'."\n"
 	  .'</table>'."\n"
 	  .'</form>'."\n";

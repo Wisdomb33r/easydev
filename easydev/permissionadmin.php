@@ -180,11 +180,11 @@ else{ // if the user has the permissions
 
 	// verify if $_GET['action'] is set. If it is the case, need to print a message to indicate that the admin permissions were successfully entered in database.
 	if(isset($_GET['action']) && $_GET['action']=='confirmPermissionChanges'){
-	  echo '<p><strong>'.htmlentities(Translator::translate('console_permission_admin_confirmation')).'</strong></p>'."\n";
+	  echo '<p><strong>'.htmlentities(Translator::translate('console_permission_admin_confirmation'), ENT_COMPAT, 'UTF-8').'</strong></p>'."\n";
 	}
 	
 	// print the HTML table header to display all administrators
-	echo '<p class="largemargintop">'.htmlentities(Translator::translate('console_change_admin_permission_header')).'</p>'."\n"
+	echo '<p class="largemargintop">'.htmlentities(Translator::translate('console_change_admin_permission_header'), ENT_COMPAT, 'UTF-8').'</p>'."\n"
 	  .'<table class="form">'."\n";
 	
 	// select all administrators from database

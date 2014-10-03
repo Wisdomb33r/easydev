@@ -17,9 +17,7 @@ if(! $session_permissions[$adminMainMenu]){ // the user should not see this page
 else{ // if the user has the permissions
 	// if there is some post data
 	if($_SERVER['REQUEST_METHOD'] == 'POST'){
-
-		// retrieve the object defined by user without the additional slashes
-		$easydevobject = stripslashes($_POST['easyDevObject']);
+		$easydevobject = $_POST['easyDevObject'];
 
 		// -------------------- start of syntax checks ------------------------------
 		// initialize a tokenizer
@@ -286,7 +284,7 @@ else{ // if the user has the permissions
 
 		// verify if $_GET['action'] is set. If it is the case, need to print a message to indicate that the compilation was successfully done.
 		if(isset($_GET['action']) && $_GET['action']=='confirmCompilation'){
-			echo '<p><strong>'.htmlentities(Translator::translate('console_compilation_confirmation')).'</strong></p>'."\n";
+			echo '<p><strong>'.htmlentities(Translator::translate('console_compilation_confirmation'), ENT_COMPAT, 'UTF-8').'</strong></p>'."\n";
 		}
 
 		$form = '';
@@ -315,7 +313,7 @@ else{ // if the user has the permissions
 		echo '<form name="objectDefineArea" action="compiler.php?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'" method="post">'."\n"
 		.'<textarea class="textareainput" name="easyDevObject">'."\n";
 		if($form != ''){
-			echo htmlentities(stripslashes($form));
+			echo htmlentities(stripslashes($form), ENT_COMPAT, 'UTF-8');
 		}
 		echo '</textarea><br />'."\n"
 		.'<input class="bouton" type="submit" name="create" value="'.Translator::translate('compile').'" />'."\n"

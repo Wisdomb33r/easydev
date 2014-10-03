@@ -55,7 +55,7 @@ else{ // if the user has the permissions
 
 	// verify if $_GET['action'] is set. If it is the case, need to print a message to indicate that the config was properly changed
 	if(isset($_GET['action']) && $_GET['action']=='confirmConfigModif'){
-	  echo '<p><strong>'.htmlentities(Translator::translate('console_config_modif_confirmation')).'</strong></p>'."\n";
+	  echo '<p><strong>'.htmlentities(Translator::translate('console_config_modif_confirmation'), ENT_COMPAT, 'UTF-8').'</strong></p>'."\n";
 	}
 	/*
 	$name = '';
@@ -81,11 +81,11 @@ else{ // if the user has the permissions
 	  }*/
 	
 	// print the HTML form to configure the console
-	echo '<p class="largemargintop">'.htmlentities(Translator::translate('console_config_modify_info')).'</p>'."\n"
+	echo '<p class="largemargintop">'.htmlentities(Translator::translate('console_config_modify_info'), ENT_COMPAT, 'UTF-8').'</p>'."\n"
 	  .'<form action="config.php?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'" method="post">'."\n"
 	  .'<table class="form">'."\n"
 	  .'  <tr>'."\n"
-	  .'    <td>'.htmlentities(Translator::translate('default_language')).' : </td>'."\n"
+	  .'    <td>'.htmlentities(Translator::translate('default_language'), ENT_COMPAT, 'UTF-8').' : </td>'."\n"
 	  .'    <td><select class="selectinput" name="default_language">'."\n";
 	$query = 'SELECT value FROM '.CONFIGURATION.' WHERE id="default_language"';
 	$result = mysql_query($query) or die('Error while selecting default language configuration.');
@@ -100,8 +100,8 @@ else{ // if the user has the permissions
 	  .'  </tr>'."\n"
 	  .'  <tr>'."\n"
 	  .'    <td>&nbsp;</td>'."\n"
-	  .'    <td><input class="bouton" type="submit" name="add" value="'.htmlentities(Translator::translate('submit')).'" />'."\n"
-	  .'        <input class="bouton" type="submit" name="cancel" value="'.htmlentities(Translator::translate('cancel')).'" /></td>'."\n"
+	  .'    <td><input class="bouton" type="submit" name="add" value="'.htmlentities(Translator::translate('submit'), ENT_COMPAT, 'UTF-8').'" />'."\n"
+	  .'        <input class="bouton" type="submit" name="cancel" value="'.htmlentities(Translator::translate('cancel'), ENT_COMPAT, 'UTF-8').'" /></td>'."\n"
 	  .'  </tr>'."\n"
 	  .'</table>'."\n"
 	  .'</form>'."\n";

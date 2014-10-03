@@ -9,8 +9,8 @@
 <script type="text/javascript" src="<?php echo CONSOLE_PATH; ?>browserSniffer.js"></script>
 <script type="text/javascript" src="<?php echo CONSOLE_PATH; ?>calendar.js"></script>
 
-<title><?php echo htmlentities(Translator::translate('console_title')); ?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title><?php echo htmlentities(Translator::translate('console_title'), ENT_COMPAT, 'UTF-8'); ?></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
 
@@ -21,8 +21,8 @@
   <tr>
     <td class="menu">
 <?php
-echo '      <p>'.$_SESSION[SESSION_NAME].' : [<a class="default" href="'.CONSOLE_PATH.'logout.php">'.htmlentities(Translator::translate('log_out')).'</a>]'
-.'<br />'.htmlentities(Translator::translate('language')).' : ';
+echo '      <p>'.$_SESSION[SESSION_NAME].' : [<a class="default" href="'.CONSOLE_PATH.'logout.php">'.htmlentities(Translator::translate('log_out'), ENT_COMPAT, 'UTF-8').'</a>]'
+.'<br />'.htmlentities(Translator::translate('language'), ENT_COMPAT, 'UTF-8').' : ';
 
 $languageList = Translator::languageList();
 foreach($languageList as $language){

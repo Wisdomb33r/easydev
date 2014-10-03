@@ -68,7 +68,7 @@ foreach($this->fieldlist as $field){
   
   // if $_GET['action'] is set and is equal to "confirmdelete", print a message
   if(isset($_GET['action']) && $_GET['action'] == 'confirmDelete'){
-    echo '<p><strong>'.htmlentities(Translator::translate('generator_confirm_delete')).'</strong></p>';
+    echo '<p><strong>'.htmlentities(Translator::translate('generator_confirm_delete'), ENT_COMPAT, 'UTF-8').'</strong></p>';
   }
 
   if(isset($_GET['action']) && $_GET['action'] == 'confirmmodify'){
@@ -139,7 +139,7 @@ foreach($dbobject->fieldlist as $f){
   }%>
   echo '  <tr>'."\n";
   echo '    <td></td><td>'."\n";
-  echo '<noscript><input type="submit" value="'.htmlentities(Translator::translate('filter')).'" /></noscript>'."\n";
+  echo '<noscript><input type="submit" value="'.htmlentities(Translator::translate('filter'), ENT_COMPAT, 'UTF-8').'" /></noscript>'."\n";
   echo '    </td>'."\n";
   echo '  </tr>'."\n";
   echo '</table>'."\n";
@@ -220,12 +220,12 @@ foreach($this->fieldlist as $field){
 }
 %>
 
-    echo '    <td><a class="default" href="objectadd_<% echo $this->name; %>.php?'.CURRENTMENU.'='.(isset($_GET[CURRENTMENU]) ? $_GET[CURRENTMENU] : '').'&objectid='.$object->id.(isset($_GET[NAVIGATION]) ? '&returnpage='.$_GET[NAVIGATION] : '').'">'.htmlentities(Translator::translate('modify')).'</a></td>'."\n";
+    echo '    <td><a class="default" href="objectadd_<% echo $this->name; %>.php?'.CURRENTMENU.'='.(isset($_GET[CURRENTMENU]) ? $_GET[CURRENTMENU] : '').'&objectid='.$object->id.(isset($_GET[NAVIGATION]) ? '&returnpage='.$_GET[NAVIGATION] : '').'">'.htmlentities(Translator::translate('modify'), ENT_COMPAT, 'UTF-8').'</a></td>'."\n";
     echo '  </tr>'."\n";
   }
   echo '  <tr>'."\n";
   echo '    <td><input type="checkbox" class="checkboxinput" onclick="checkall(this.checked)" />'.Translator::translate('all').'</td>'."\n";
-  echo '    <td colspan="<% echo ($printedfieldcounter + 1);%>"><input class="bouton" type="submit" name="delete<% echo $this->name; %>submit" value="'.htmlentities(Translator::translate('delete')).'" /></td>'."\n";
+  echo '    <td colspan="<% echo ($printedfieldcounter + 1);%>"><input class="bouton" type="submit" name="delete<% echo $this->name; %>submit" value="'.htmlentities(Translator::translate('delete'), ENT_COMPAT, 'UTF-8').'" /></td>'."\n";
   echo '    <td></td>'."\n";
   echo '  </tr>'."\n";
   echo '</table>'."\n";

@@ -58,7 +58,7 @@ class dbobject{
 		$ret .= '1n_rel_'.$field->options['relationname'].' int(10) unsigned '.(isset($field->options['nullable']) && $field->options['nullable'] ? '' : 'NOT').' NULL,'."\n";
 		break;
 	  case 'string':
-		$ret .= $field->label.' varchar(255) collate latin1_german1_ci NULL,'."\n";
+		$ret .= $field->label.' varchar(255) collate utf8_general_ci NULL,'."\n";
 		break;
 	  case 'bool':
 		$ret .= $field->label.' tinyint(1) NULL,'."\n";
@@ -70,7 +70,7 @@ class dbobject{
 		$ret .= $field->label.' double NULL,'."\n";
 		break;
 	  case 'text':
-		$ret .= $field->label.' text collate latin1_german1_ci NULL,'."\n";
+		$ret .= $field->label.' text collate utf8_general_ci NULL,'."\n";
 		break;
 	  case 'image':
 	  	$ret .= $field->label.' varchar(20) NULL,'."\n";
@@ -95,7 +95,7 @@ class dbobject{
 	  }
 	}
 	$ret .= 'PRIMARY KEY (ID)'."\n"
-	  .') ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci;';
+	  .') ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;';
 	array_push($return, $ret);
 
 	// add the constraints on the fields that are relations with other tables
@@ -121,7 +121,7 @@ class dbobject{
 			.'id_'.$field->label.' int(10) unsigned NOT NULL,'."\n"
 			.'id_'.$this->name.' int(10) unsigned NOT NULL,'."\n"
 			.'PRIMARY KEY (id_'.$field->label.',id_'.$this->name.')'."\n"
-			.') ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci;';
+			.') ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;';
 		  array_push($return, $query);
 
 		  // create the InnoDB relations

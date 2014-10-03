@@ -15,6 +15,8 @@ require_once 'object_<% echo $field->label; %>.class.php';<%
 }%>
 
 class <% echo $this->name; %>{
+  // static array as cache
+  public static $objects_<% echo $this->name; %>;
   // variables of the class
   protected $id;<%
 foreach($this->fieldlist as $field){
@@ -53,7 +55,8 @@ foreach($this->fieldlist as $field){
     break;
   case 'relationNM':
 %>
-  protected $relationNM<% echo $field->options['relationname']; %>;<%
+  protected $relationNM<% echo $field->options['relationname']; %>;
+  protected $relationNM<% echo $field->options['relationname']; %>LoadDone = false;<%
 	break;
   }
 }
@@ -136,14 +139,52 @@ foreach($this->fieldlist as $field){
 	}
 	if($field->type == 'relationNM'){%>
 	if($name == '<% echo $field->options['relationname']; %>'){
-	  if(count($this->relationNM<% echo $field->options['relationname']; %>)){
+	  if(! $this->relationNM<% echo $field->options['relationname']; %>LoadDone){
+	    $this->__get('relationNM<% echo $field->options['relationname']; %>');
+	  }
+	  
+	  if( isset($this-><% echo $field->options['relationname']; %>) && is_array($this-><% echo $field->options['relationname']; %>)){
+	  	return $this-><% echo $field->options['relationname']; %>;
+	  }
+	  else {
 	    $this-><% echo $field->options['relationname']; %> = array();
-	    foreach($this->relationNM<% echo $field->options['relationname']; %> as $id){
-	      if($relatedobject = <% echo $field->label; %>::findByPrimaryId($id)){
-	        $this-><% echo $field->options['relationname']; %>[] = $relatedobject;
+	    if(count($this->relationNM<% echo $field->options['relationname']; %>)){
+	      foreach($this->relationNM<% echo $field->options['relationname']; %> as $id){
+	        if($relatedobject = <% echo $field->label; %>::findByPrimaryId($id)){
+	          $this-><% echo $field->options['relationname']; %>[] = $relatedobject;
+	        }
 	      }
 	    }
 	  }
+	}
+	if($name == 'relationNM<% echo $field->options['relationname']; %>'){
+      if($this->relationNM<% echo $field->options['relationname']; %>LoadDone){
+        return $this->relationNM<% echo $field->options['relationname']; %>;
+      }
+      else {<%
+if(isset($field->options['secondobject']) && $field->options['secondobject']){%>
+        global $querycount;
+  	    if(! is_numeric($querycount)) $querycount = 0;
+  	    else $querycount++;
+        $query = 'SELECT id_<% echo $field->label; %> FROM object_<% echo $field->label; %>_<% echo $this->name; %>_<% echo $field->options['relationname']; %>_nmrelation '
+                .'WHERE id_<% echo $this->name; %>="'.$this->id.'"';<%
+}
+else{%>
+        global $querycount;
+  	    if(! is_numeric($querycount)) $querycount = 0;
+  	    else $querycount++;
+        $query = 'SELECT id_<% echo $field->label; %> FROM object_<% echo $this->name; %>_<% echo $field->label; %>_<% echo $field->options['relationname']; %>_nmrelation '
+                .'WHERE id_<% echo $this->name; %>="'.$this->id.'"';<%
+}%>
+        $result2 = mysql_query($query) or die('Error while selecting N:M relations.');
+
+        $relationNMidlist = array();
+        while($row2 = mysql_fetch_array($result2)){
+          $relationNMidlist[] = $row2[0];
+        }
+        $this->relationNM<% echo $field->options['relationname']; %> = $relationNMidlist;
+        $this->relationNM<% echo $field->options['relationname']; %>LoadDone = true;
+      }
 	}<%
 	}
 }%>
@@ -202,6 +243,9 @@ else{%>
    * @param boolean true if the object id was added to the list, false otherwise.
    */
   public function addrelation<% echo $field->options['relationname']; %>(<% echo $field->label; %> $foreignobject){
+  	if(! $this->relationNM<% echo $field->options['relationname']; %>LoadDone){
+  	  $this->__get('relationNM<% echo $field->options['relationname']; %>');
+  	}
 	if($foreignobject && $foreignobject->id && ! in_array($foreignobject->id, $this->relationNM<% echo $field->options['relationname']; %>)){
 	  array_push($this->relationNM<% echo $field->options['relationname']; %>, $foreignobject->id);
 	  return true;
@@ -217,6 +261,9 @@ else{%>
    * @return boolean true if the link has been properly removed, false otherwise.
    */
   public function removerelation<% echo $field->options['relationname']; %>(<% echo $field->label; %> $foreignobject){
+  	if(! $this->relationNM<% echo $field->options['relationname']; %>LoadDone){
+  	  $this->__get('relationNM<% echo $field->options['relationname']; %>');
+  	}
 	if(! $foreignobject || ! $foreignobject->id){
 	  return false;
 	}
@@ -353,7 +400,14 @@ foreach($this->fieldlist as $field){
    * or updated if the primary id is not equal to zero (non-zero init is done by the finders).
    */
   public function store($validatefunction = 'verifyValues'){
-  	if($this->$validatefunction()){
+  	if($this->$validatefunction()){<%
+foreach($this->fieldlist as $field){
+  if($field->type == 'relationNM'){%>
+      if(! $this->relationNM<% echo $field->options['relationname']; %>LoadDone){
+        $this->__get('relationNM<% echo $field->options['relationname']; %>');
+      }<%
+  }
+}%>
   	  mysql_query('START TRANSACTION');
       $query = '';
       if(!isset($this->id)){
@@ -711,7 +765,9 @@ foreach($this->fieldlist as $field){
               $newheight = $newwidth * $h / $w;
               if($resource){
                 $resizedresource = imagecreatetruecolor($newwidth, $newheight);
+                imagealphablending($resizedresource, false);
                 $status = imagecopyresampled($resizedresource, $resource, 0, 0, 0, 0, $newwidth, $newheight, $w, $h);
+                imagesavealpha($resizedresource, true);
                 if($status){
                   switch($imageinfos[2]){
                     case IMAGETYPE_GIF:
@@ -786,6 +842,9 @@ foreach($this->fieldlist as $field){
   /* Count the number of elements in the table of the object.
    */
   public static function count(){
+  	global $querycount;
+  	if(! is_numeric($querycount)) $querycount = 0;
+  	else $querycount++;
     $query = 'SELECT COUNT(*) FROM object_<% echo $this->name; %>';
     $result = mysql_query($query) or die('Error while counting objects.');
     $line = mysql_fetch_array($result);
@@ -795,6 +854,9 @@ foreach($this->fieldlist as $field){
   /* Return the id list of the elements of the table of the object.
    */
   public static function idList(){
+  	global $querycount;
+  	if(! is_numeric($querycount)) $querycount = 0;
+  	else $querycount++;
     $query = 'SELECT id FROM object_<% echo $this->name; %> ORDER BY id ASC';
     $result = mysql_query($query) or die('Error while selecting id list.');
     $idlist = array();
@@ -811,6 +873,9 @@ foreach($this->fieldlist as $field){
    * @param integer $nb The number of object to return starting at $lim position.
    */
   public static function find($lim = null, $nb = null){
+  	global $querycount;
+  	if(! is_numeric($querycount)) $querycount = 0;
+  	else $querycount++;
     $query = 'SELECT * FROM object_<% echo $this->name; %> ORDER BY id DESC'.($lim !== null && $nb !== null ? ' LIMIT '.$lim.', '.$nb : '');
     $result = mysql_query($query) or die('Error while loading objects.');
     $objectlist = array();
@@ -835,23 +900,6 @@ foreach($this->fieldlist as $field){
   if($field->type == 'relation1N'){%>
       $object->relation1N<% echo $field->options['relationname']; %> = $row['1n_rel_<% echo $field->options['relationname']; %>'];<%
   }
-  if($field->type == 'relationNM'){
-    if(isset($field->options['secondobject']) && $field->options['secondobject']){%>
-      $query = 'SELECT id_<% echo $field->label; %> FROM object_<% echo $field->label; %>_<% echo $this->name; %>_<% echo $field->options['relationname']; %>_nmrelation '
-              .'WHERE id_<% echo $this->name; %>="'.$row['id'].'"';<%
-    }
-    else{%>
-      $query = 'SELECT id_<% echo $field->label; %> FROM object_<% echo $this->name; %>_<% echo $field->label; %>_<% echo $field->options['relationname']; %>_nmrelation '
-              .'WHERE id_<% echo $this->name; %>="'.$row['id'].'"';<%
-    }%>
-      $result2 = mysql_query($query) or die('Error while selecting N:M relations.');
-
-      $relationNMidlist = array();
-      while($row2 = mysql_fetch_array($result2)){
-        $relationNMidlist[] = $row2[0];
-      }
-      $object->relationNM<% echo $field->options['relationname']; %> = $relationNMidlist;<%
-  }
 }%>
       $object->id = $row['id'];
       array_push($objectlist, $object);
@@ -863,52 +911,45 @@ foreach($this->fieldlist as $field){
   /* Finder for the primary id
    * @param integer id the identifier of the object to return
    */
-  public static function findByPrimaryId($id){
-    $query = 'SELECT * FROM object_<% echo $this->name; %> WHERE id="'.addslashes($id).'"';
-    $result = mysql_query($query) or die('Error while selecting objects.');
-    if($row = mysql_fetch_array($result)){<%
+    public static function findByPrimaryId($id){
+    if(!is_numeric($id) || $id <= 0) return null;
+  	if(isset(self::$objects_<% echo $this->name; %>[$id])){
+      return self::$objects_<% echo $this->name; %>[$id];
+  	}
+    else {
+      global $querycount;
+      if(! is_numeric($querycount)) $querycount = 0;
+      else $querycount++;
+      $query = 'SELECT * FROM object_<% echo $this->name; %> WHERE id="'.addslashes($id).'"';
+      $result = mysql_query($query) or die('Error while selecting objects.');
+      if($row = mysql_fetch_array($result)){<%
 foreach($this->fieldlist as $field){
 	if($field->type == 'password'){%>
-	  $row['<% echo $field->label; %>_hashed'] = $row['<% echo $field->label; %>'];
-	  unset($row['<% echo $field->label; %>']);<%
+	    $row['<% echo $field->label; %>_hashed'] = $row['<% echo $field->label; %>'];
+	    unset($row['<% echo $field->label; %>']);<%
 	}
 	if($field->type == 'datetime'){%>
-	  if(isset($row['<% echo $field->label; %>']) && $row['<% echo $field->label; %>'] != '' && strlen($row['<% echo $field->label; %>']) == 19){
-	    $row['<% echo $field->label; %>date'] = substr($row['<% echo $field->label; %>'], 0, 10);
-	    $row['<% echo $field->label; %>hour'] = substr($row['<% echo $field->label; %>'], 11, 2);
-	    $row['<% echo $field->label; %>mins'] = substr($row['<% echo $field->label; %>'], 14, 2);
-	  }<%
+	    if(isset($row['<% echo $field->label; %>']) && $row['<% echo $field->label; %>'] != '' && strlen($row['<% echo $field->label; %>']) == 19){
+	      $row['<% echo $field->label; %>date'] = substr($row['<% echo $field->label; %>'], 0, 10);
+	      $row['<% echo $field->label; %>hour'] = substr($row['<% echo $field->label; %>'], 11, 2);
+	      $row['<% echo $field->label; %>mins'] = substr($row['<% echo $field->label; %>'], 14, 2);
+	    }<%
 	}
 }%>
-      $object = new <% echo $this->name; %>($row);
-      // set the relations<%
+        $object = new <% echo $this->name; %>($row);
+        // set the relations<%
 foreach($this->fieldlist as $field){
   if($field->type == 'relation1N'){%>
-      $object->relation1N<% echo $field->options['relationname']; %> = $row['1n_rel_<% echo $field->options['relationname']; %>'];<%
-  }
-  if($field->type == 'relationNM'){
-    if(isset($field->options['secondobject']) && $field->options['secondobject']){%>
-      $query = 'SELECT id_<% echo $field->label; %> FROM object_<% echo $field->label; %>_<% echo $this->name; %>_<% echo $field->options['relationname']; %>_nmrelation '
-              .'WHERE id_<% echo $this->name; %>="'.$row['id'].'"';<%
-    }
-    else{%>
-      $query = 'SELECT id_<% echo $field->label; %> FROM object_<% echo $this->name; %>_<% echo $field->label; %>_<% echo $field->options['relationname']; %>_nmrelation '
-              .'WHERE id_<% echo $this->name; %>="'.$row['id'].'"';<%
-    }%>
-      $result2 = mysql_query($query) or die('Error while selecting N:M relations.');
-
-      $relationNMidlist = array();
-      while($row2 = mysql_fetch_array($result2)){
-        $relationNMidlist[] = $row2[0];
-      }
-      $object->relationNM<% echo $field->options['relationname']; %> = $relationNMidlist;<%
+        $object->relation1N<% echo $field->options['relationname']; %> = $row['1n_rel_<% echo $field->options['relationname']; %>'];<%
   }
 }%>
-      $object->id = $row['id'];
-      return $object;
-    }
-    else{
-      return false;
+        $object->id = $row['id'];
+        self::$objects_<% echo $this->name; %>[$id] = $object;
+        return $object;
+      }
+      else{
+        return false;
+      }
     }
   }
 
@@ -924,6 +965,9 @@ if($needrelation1Nfilter){%>
    * @param table $valuelist A table containing the filters to apply on the selection query. This table should be of the form : array('relationname' => 'value'), where 'relationname' is the name of the relation on which to apply the filter.
    */
   public static function countByRelation1N($valuelist){
+  	global $querycount;
+  	if(! is_numeric($querycount)) $querycount = 0;
+  	else $querycount++;
     $selectfilter = ' 1 ';
     foreach($valuelist as $key => $value){
       $selectfilter .= ' AND 1n_rel_'.$key.'="'.$value.'" ';
@@ -938,6 +982,9 @@ if($needrelation1Nfilter){%>
    * @param table $valuelist A table containing the filters to apply on the selection query. This table should be of the form : array('relationname' => 'value'), where 'relationname' is the name of the relation on which to apply the filter.
    */
   public static function findByRelation1N($valuelist, $lim = null, $nb = null){
+  	global $querycount;
+  	if(! is_numeric($querycount)) $querycount = 0;
+  	else $querycount++;
     $selectfilter = ' 1 ';
     foreach($valuelist as $key => $value){
       $selectfilter .= ' AND 1n_rel_'.$key.'="'.$value.'" ';
@@ -965,23 +1012,6 @@ foreach($this->fieldlist as $field){
 foreach($this->fieldlist as $field){
   if($field->type == 'relation1N'){%>
       $object->relation1N<% echo $field->options['relationname']; %> = $row['1n_rel_<% echo $field->options['relationname']; %>'];<%
-  }
-  if($field->type == 'relationNM'){
-    if(isset($field->options['secondobject']) && $field->options['secondobject']){%>
-      $query = 'SELECT id_<% echo $field->label; %> FROM object_<% echo $field->label; %>_<% echo $this->name; %>_<% echo $field->options['relationname']; %>_nmrelation '
-              .'WHERE id_<% echo $this->name; %>="'.$row['id'].'"';<%
-    }
-    else{%>
-      $query = 'SELECT id_<% echo $field->label; %> FROM object_<% echo $this->name; %>_<% echo $field->label; %>_<% echo $field->options['relationname']; %>_nmrelation '
-              .'WHERE id_<% echo $this->name; %>="'.$row['id'].'"';<%
-    }%>
-      $result2 = mysql_query($query) or die('Error while selecting N:M relations.');
-
-      $relationNMidlist = array();
-      while($row2 = mysql_fetch_array($result2)){
-        $relationNMidlist[] = $row2[0];
-      }
-      $object->relationNM<% echo $field->options['relationname']; %> = $relationNMidlist;<%
   }
 }%>
       $object->id = $row['id'];
@@ -1015,6 +1045,9 @@ foreach($field->options['finderparameters'] as $param){
   $userquery = str_replace($param, '"\'.addslashes($'.$param.').\'"', $userquery);
 }
 %>
+    global $querycount;
+  	if(! is_numeric($querycount)) $querycount = 0;
+  	else $querycount++;
     $query = '<% echo $userquery; %>';
     $result = mysql_query($query) or die('Error while selecting objects.');
 
@@ -1039,23 +1072,6 @@ foreach($this->fieldlist as $field){
 foreach($this->fieldlist as $field){
   if($field->type == 'relation1N'){%>
       $object->relation1N<% echo $field->options['relationname']; %> = $row['1n_rel_<% echo $field->options['relationname']; %>'];<%
-  }
-  if($field->type == 'relationNM'){
-    if(isset($field->options['secondobject']) && $field->options['secondobject']){%>
-      $query = 'SELECT id_<% echo $field->label; %> FROM object_<% echo $field->label; %>_<% echo $this->name; %>_<% echo $field->options['relationname']; %>_nmrelation '
-              .'WHERE id_<% echo $this->name; %>="'.$row['id'].'"';<%
-    }
-    else{%>
-      $query = 'SELECT id_<% echo $field->label; %> FROM object_<% echo $this->name; %>_<% echo $field->label; %>_<% echo $field->options['relationname']; %>_nmrelation '
-              .'WHERE id_<% echo $this->name; %>="'.$row['id'].'"';<%
-    }%>
-      $result2 = mysql_query($query) or die('Error while selecting N:M relations.');
-
-      $relationNMidlist = array();
-      while($row2 = mysql_fetch_array($result2)){
-        $relationNMidlist[] = $row2[0];
-      }
-      $object->relationNM<% echo $field->options['relationname']; %> = $relationNMidlist;<%
   }
 }%>
       $object->id = $row['id'];
@@ -1120,7 +1136,7 @@ foreach($this->fieldlist as $field){
   case 'double': %>
     $ret .= '  <tr>'."\n";
     $ret .= '    <td><% echo $field->label;%> : </td>'."\n".
-            '    <td><input type="text" name="<% echo $field->label;%>" '.($postedobject != null ? 'value="'.htmlentities($postedobject-><% echo $field->label;%>).'"' : '').'/>'."\n";
+            '    <td><input type="text" name="<% echo $field->label;%>" '.($postedobject != null ? 'value="'.htmlentities($postedobject-><% echo $field->label;%>, ENT_COMPAT, 'UTF-8').'"' : '').'/>'."\n";
     $ret .= '  </tr>'."\n";<%
     break;
   case 'password': %>
@@ -1136,7 +1152,7 @@ foreach($this->fieldlist as $field){
   case 'text': %>
     $ret .= '  <tr>'."\n";
     $ret .= '    <td><% echo $field->label;%> : </td>'."\n".
-            '    <td><textarea name="<% echo $field->label;%>">'.($postedobject != null ? htmlentities($postedobject-><% echo $field->label;%>) : '').'</textarea>'."\n";
+            '    <td><textarea name="<% echo $field->label;%>">'.($postedobject != null ? htmlentities($postedobject-><% echo $field->label;%>, ENT_COMPAT, 'UTF-8') : '').'</textarea>'."\n";
     $ret .= '  </tr>'."\n";<%
     break;
   case 'bool': %>

@@ -106,7 +106,7 @@ foreach($obj->fieldlist as $field){
   
   echo '  <tr>'."\n";
   echo '    <td><input type="hidden" name="selected" value="'.$_GET['selected'].'" /></td>'."\n";
-  echo '    <td><input class="bouton" type="submit" name="validateRelations" value="'.htmlentities(Translator::translate('create_relations')).'" /> <input type="submit" name="cancel" value="'.htmlentities(Translator::translate('cancel')).'" /></td>'."\n";
+  echo '    <td><input class="bouton" type="submit" name="validateRelations" value="'.htmlentities(Translator::translate('create_relations'), ENT_COMPAT, 'UTF-8').'" /> <input type="submit" name="cancel" value="'.htmlentities(Translator::translate('cancel'), ENT_COMPAT, 'UTF-8').'" /></td>'."\n";
   echo '  </tr>'."\n";
   echo '</table>'."\n";
   echo '</form>'."\n";

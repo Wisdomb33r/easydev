@@ -8,7 +8,7 @@ require_once('includes.php');
 include 'adminheader.php';
 
 // default page (very simple one now)
-echo '<p class="center largemargintop">'.htmlentities(Translator::translate('console_main_default_content')).'</p>'."\n";
+echo '<p class="center largemargintop">'.htmlentities(Translator::translate('console_main_default_content'), ENT_COMPAT, 'UTF-8').'</p>'."\n";
 
 // include the HTML footer
 include 'adminfooter.php';

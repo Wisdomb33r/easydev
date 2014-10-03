@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- Host: localhost
--- Generation Time: Jun 02, 2011 at 12:19 PM
+-- Generation Time: Oct 03, 2014 at 12:19 PM
 -- Server version: 5.0.41
 -- PHP Version: 5.2.3
 
@@ -21,10 +21,10 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
 CREATE TABLE `adminmain` (
   `id` int(10) unsigned NOT NULL auto_increment,
-  `text` varchar(255) collate latin1_german1_ci NOT NULL default '',
+  `text` varchar(255) collate utf8_general_ci NOT NULL default '',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `text` (`text`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci AUTO_INCREMENT=10 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci AUTO_INCREMENT=10 ;
 
 -- 
 -- Dumping data for table `adminmain`
@@ -47,11 +47,11 @@ INSERT INTO `adminmain` (`id`, `text`) VALUES
 CREATE TABLE `adminsub` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `id_mainmenu` int(10) unsigned NOT NULL,
-  `text` varchar(255) collate latin1_german1_ci NOT NULL,
-  `url` varchar(255) collate latin1_german1_ci NOT NULL,
+  `text` varchar(255) collate utf8_general_ci NOT NULL,
+  `url` varchar(255) collate utf8_general_ci NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `id_mainmenu` (`id_mainmenu`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci AUTO_INCREMENT=20 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci AUTO_INCREMENT=20 ;
 
 -- 
 -- Dumping data for table `adminsub`
@@ -75,11 +75,11 @@ INSERT INTO `adminsub` (`id`, `id_mainmenu`, `text`, `url`) VALUES
 
 CREATE TABLE `authorized_admins` (
   `id` int(10) unsigned NOT NULL auto_increment,
-  `name` varchar(255) collate latin1_german1_ci NOT NULL,
-  `password` varchar(255) collate latin1_german1_ci NOT NULL,
+  `name` varchar(255) collate utf8_general_ci NOT NULL,
+  `password` varchar(255) collate utf8_general_ci NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci AUTO_INCREMENT=5 ;
 
 -- 
 -- Dumping data for table `authorized_admins`
@@ -95,10 +95,10 @@ INSERT INTO `authorized_admins` (`id`, `name`, `password`) VALUES
 -- 
 
 CREATE TABLE `configuration` (
-  `id` varchar(25) collate latin1_german1_ci NOT NULL,
-  `value` varchar(255) collate latin1_german1_ci NOT NULL,
+  `id` varchar(25) collate utf8_general_ci NOT NULL,
+  `value` varchar(255) collate utf8_general_ci NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- 
 -- Dumping data for table `configuration`
@@ -106,7 +106,7 @@ CREATE TABLE `configuration` (
 
 INSERT INTO `configuration` (`id`, `value`) VALUES 
 ('default_language', 'fr'),
-('version', '2.1');
+('version', '2.2');
 
 -- --------------------------------------------------------
 
@@ -116,11 +116,11 @@ INSERT INTO `configuration` (`id`, `value`) VALUES
 
 CREATE TABLE `easydev_objects` (
   `id_mainmenu` int(10) unsigned NOT NULL,
-  `name` varchar(50) collate latin1_german1_ci NOT NULL,
-  `definition` text collate latin1_german1_ci,
+  `name` varchar(50) collate utf8_general_ci NOT NULL,
+  `definition` text collate utf8_general_ci,
   PRIMARY KEY  (`id_mainmenu`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- 
 -- Dumping data for table `easydev_objects`
@@ -136,10 +136,10 @@ CREATE TABLE `easydev_objects` (
 CREATE TABLE `easydev_objects_foreign_key` (
   `id_object` int(10) unsigned NOT NULL,
   `id_foreign_object` int(10) unsigned NOT NULL,
-  `relationname` varchar(255) collate latin1_german1_ci NOT NULL,
+  `relationname` varchar(255) collate utf8_general_ci NOT NULL,
   PRIMARY KEY  (`id_object`,`id_foreign_object`,`relationname`),
   KEY `id_foreign_object` (`id_foreign_object`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- 
 -- Dumping data for table `easydev_objects_foreign_key`
@@ -155,11 +155,11 @@ CREATE TABLE `easydev_objects_foreign_key` (
 CREATE TABLE `easydev_objects_linking_tables` (
   `id_objet1` int(10) unsigned NOT NULL,
   `id_objet2` int(10) unsigned NOT NULL,
-  `table_name` varchar(64) collate latin1_german1_ci NOT NULL,
-  `relationname` varchar(255) collate latin1_german1_ci NOT NULL,
+  `table_name` varchar(64) collate utf8_general_ci NOT NULL,
+  `relationname` varchar(255) collate utf8_general_ci NOT NULL,
   PRIMARY KEY  (`id_objet1`,`id_objet2`,`table_name`),
   KEY `id_objet2` (`id_objet2`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- 
 -- Dumping data for table `easydev_objects_linking_tables`
@@ -174,9 +174,9 @@ CREATE TABLE `easydev_objects_linking_tables` (
 
 CREATE TABLE `logs` (
   `id` int(10) unsigned NOT NULL auto_increment,
-  `log` varchar(255) collate latin1_german1_ci NOT NULL,
+  `log` varchar(255) collate utf8_general_ci NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci AUTO_INCREMENT=1 ;
 
 -- 
 -- Dumping data for table `logs`
@@ -194,7 +194,7 @@ CREATE TABLE `permission_admins` (
   `id_mainsection` int(10) unsigned NOT NULL,
   PRIMARY KEY  (`id_admin`,`id_mainsection`),
   KEY `id_mainsection` (`id_mainsection`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- 
 -- Dumping data for table `permission_admins`
@@ -216,11 +216,11 @@ INSERT INTO `permission_admins` (`id_admin`, `id_mainsection`) VALUES
 
 CREATE TABLE `translation_languages` (
   `id` int(10) unsigned NOT NULL auto_increment,
-  `language` varchar(50) collate latin1_german1_ci NOT NULL,
-  `tag` varchar(2) collate latin1_german1_ci NOT NULL,
+  `language` varchar(50) collate utf8_general_ci NOT NULL,
+  `tag` varchar(2) collate utf8_general_ci NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `tag` (`tag`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci AUTO_INCREMENT=3 ;
 
 -- 
 -- Dumping data for table `translation_languages`
@@ -237,11 +237,11 @@ INSERT INTO `translation_languages` (`id`, `language`, `tag`) VALUES
 
 
 CREATE TABLE `translation_strings` (
-  `keyword` varchar(64) collate latin1_german1_ci NOT NULL,
-  `fr` text collate latin1_german1_ci,
-  `en` text collate latin1_german1_ci,
+  `keyword` varchar(64) collate utf8_general_ci NOT NULL,
+  `fr` text collate utf8_general_ci,
+  `en` text collate utf8_general_ci,
   PRIMARY KEY  (`keyword`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Contenu de la table `translation_strings`

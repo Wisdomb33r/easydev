@@ -4,7 +4,7 @@
 define('COMPILER_ACCEPTED_CHAR'     , '/^[a-zA-Z0-9_\.\<\>\,\=\*\(\)\"\s\{\};!]+$/');
 define('CLASSNAME_REGEXP'           , '/^[a-zA-Z]([a-zA-Z0-9_]*[a-zA-Z0-9]+)*$/');
 define('FIELDNAME_REGEXP'           , '/^[a-zA-Z]([a-zA-Z0-9_]*[a-zA-Z0-9]+)*$/');
-define('USERNAME_ACCEPTED_CHARS'    , '/^[a-zA-Z0-9абвдийклнмопутцфъщьы]+$/');
+define('USERNAME_ACCEPTED_CHARS'    , '/^[a-zA-Z0-9Г ГЎГўГ¤ГЁГ©ГЄГ«Г­Г¬Г®ГЇГіГІГ¶ГґГєГ№ГјГ»]+$/');
 
 // session variables
 define('SESSION_LOGIN'              , 'userid');

@@ -52,7 +52,7 @@ else{ // if the user has the permissions
 
 	// verify if $_GET['action'] is set. If it is the case, need to print a message to indicate that the admin was successfully deleted.
 	if(isset($_GET['action']) && $_GET['action']=='confirmAdminDelete'){
-	  echo '<p><strong>'.htmlentities(Translator::translate('console_remove_admin_confirmation')).'</strong></p>'."\n";
+	  echo '<p><strong>'.htmlentities(Translator::translate('console_remove_admin_confirmation'), ENT_COMPAT, 'UTF-8').'</strong></p>'."\n";
 	}
 
 	// select all administrators
@@ -60,7 +60,7 @@ else{ // if the user has the permissions
 	$result = mysql_query($query) or die('Error while selecting admin list.');
 	
 	// print the HTML form to delete administrators in the database
-	echo '<p class="largemargintop">'.htmlentities(Translator::translate('console_remove_admin_header')).'</p>'."\n"
+	echo '<p class="largemargintop">'.htmlentities(Translator::translate('console_remove_admin_header'), ENT_COMPAT, 'UTF-8').'</p>'."\n"
 	  .'<form action="'.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'" method="post">'."\n"
 	  .'<table class="form">'."\n";
 
@@ -76,8 +76,8 @@ else{ // if the user has the permissions
 	}
 	echo '  <tr>'."\n"
 	  .'    <td>&nbsp;</td>'."\n"
-	  .'    <td><input class="bouton" type="submit" name="delete" value="'.htmlentities(Translator::translate('delete')).'" />'."\n"
-	  .'        <input class="bouton" type="submit" name="cancel" value="'.htmlentities(Translator::translate('cancel')).'" /></td>'."\n"
+	  .'    <td><input class="bouton" type="submit" name="delete" value="'.htmlentities(Translator::translate('delete'), ENT_COMPAT, 'UTF-8').'" />'."\n"
+	  .'        <input class="bouton" type="submit" name="cancel" value="'.htmlentities(Translator::translate('cancel'), ENT_COMPAT, 'UTF-8').'" /></td>'."\n"
 	  .'  </tr>'."\n"
 	  .'</table>'."\n"
 	  .'</form>'."\n";

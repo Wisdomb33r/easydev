@@ -180,7 +180,7 @@ else{ // if the user has the permissions
 
 		// verify if $_GET['action'] is set. If it is the case, need to print a message to indicate that the compilation was successfully done.
 		if(isset($_GET['action']) && $_GET['action']=='confirmRegenerate'){
-			echo '<p><strong>'.htmlentities(Translator::translate('console_regeneration_confirmation')).'</strong></p>'."\n";
+			echo '<p><strong>'.htmlentities(Translator::translate('console_regeneration_confirmation'), ENT_COMPAT, 'UTF-8').'</strong></p>'."\n";
 		}
 
 		// Verify if there is some errors and posted values.
@@ -201,7 +201,7 @@ else{ // if the user has the permissions
 			unset($_SESSION[SESSION_POSTED]);
 		}
 
-		echo '<p class="largemargintop">'.htmlentities(Translator::translate('console_regeneration_page_title')).'</p>'."\n";
+		echo '<p class="largemargintop">'.htmlentities(Translator::translate('console_regeneration_page_title'), ENT_COMPAT, 'UTF-8').'</p>'."\n";
 
 		// select every compilation done up to now
 		$query = 'SELECT id_mainmenu AS id, name, definition FROM '.EASYDEV_OBJECTS.' ORDER BY definition';
@@ -215,7 +215,7 @@ else{ // if the user has the permissions
 			if($row['definition'] != $lastdefinition){
 				if(!$first){ // if this is not the first definition evaluated
 					echo '</td>'."\n";
-					echo '<td><a class="default" href="'.$_SERVER['PHP_SELF'].'?id='.$lastid.'&amp;action=regenerate&amp;'.CURRENTMENU.'='.$_GET[CURRENTMENU].'">'.htmlentities(Translator::translate('console_regeneration_link_text')).'</a></td>'."\n";
+					echo '<td><a class="default" href="'.$_SERVER['PHP_SELF'].'?id='.$lastid.'&amp;action=regenerate&amp;'.CURRENTMENU.'='.$_GET[CURRENTMENU].'">'.htmlentities(Translator::translate('console_regeneration_link_text'), ENT_COMPAT, 'UTF-8').'</a></td>'."\n";
 					echo '</tr>'."\n";
 				}
 				$lastdefinition = $row['definition'];
@@ -229,7 +229,7 @@ else{ // if the user has the permissions
 			}
 		}
 		echo '</td>'."\n";
-		echo '<td><a class="default" href="'.$_SERVER['PHP_SELF'].'?id='.$lastid.'&amp;action=regenerate&amp;'.CURRENTMENU.'='.$_GET[CURRENTMENU].'">'.htmlentities(Translator::translate('console_regeneration_link_text')).'</a></td>'."\n";
+		echo '<td><a class="default" href="'.$_SERVER['PHP_SELF'].'?id='.$lastid.'&amp;action=regenerate&amp;'.CURRENTMENU.'='.$_GET[CURRENTMENU].'">'.htmlentities(Translator::translate('console_regeneration_link_text'), ENT_COMPAT, 'UTF-8').'</a></td>'."\n";
 		echo '</tr>'."\n";
 		echo '</table>'."\n";
 
