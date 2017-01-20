@@ -44,39 +44,24 @@ a.default:hover{
 	border: 1px solid #0000FF;
 }
 
-td.banniere {
-	width : 950px;
-	height : 100px;
-	padding : 0px;
-	border : 1px solid #000000;
-	background : url("banniere.jpg") no-repeat;
-}
-
 table.console{
-	margin: auto;
-	width: 951px;
 	padding: 0px;
-	border-right : 1px solid #000000;
+	border: 0;
 	border-collapse : collapse;
 }
 
 td.menu{
 	vertical-align: top;
-	width: 200px;
-	height: 700px;
-	border-left : 1px solid #000000;
-	border-bottom : 1px solid #000000;
+	border: 1px solid #000000;
 	margin : 0px;
 	padding : 2px;
 	border-collapse : collapse;
 	text-align : left; /* cancel trick IE for menu */
+	white-space: nowrap;
 }
 
 td.content{
 	vertical-align: top;
-	width : 750px;
-	border-bottom : 1px solid #000000;
-	border-left : 1px solid #000000;
 	margin : 0px;
 	padding : 2px;
 	border-collapse : collapse;
@@ -116,8 +101,8 @@ p.largemargintop{
 }
 
 table.form{
-	margin-top: 20px;
-	margin-left: 20px;
+	margin-top: 10px;
+	margin-left: 10px;
 }
 
 table.form tr{
@@ -172,21 +157,27 @@ td.objectmodifyname{
 }
 
 .marginleft{
-	margin-left: 20px;
+	margin-left: 10px;
 }
 
-.deletescript td{
+.deletescript td, .deletescript th{
 	padding-left: 5px;
+	white-space: nowrap;
 }
 
 
 /* AUTO-GENERATED FORMS STYLES */
 
 .easydevform table{
+	border-collapse: collapse;
 }
 
 .easydevform tr{
 	vertical-align: top;
+}
+
+table.deletescript tr:nth-child(even) {
+    background-color: #EEEEEE;
 }
 
 .easydevform td{
@@ -198,7 +189,7 @@ td.objectmodifyname{
 	font-size: 8pt;
 	font-family: Verdana, Arial, Helvetica;
 	border: 1px solid #AAAAAA;
-	width: 250px;
+	width: 500px;
 }
 
 .easydevform input[type="submit"]{
@@ -209,11 +200,11 @@ td.objectmodifyname{
 .easydevform select{
 	font-size: 8pt;
 	border: 1px solid #AAAAAA;
-	width: 250px;
+	width: 500px;
 }
 
 .easydevform input[type="checkbox"]{
-	margin-top: 3px;
+	margin-top: -1px;
 	margin-bottom : 0;
 	margin-left: 0;
 	margin-right: 3px;
@@ -228,14 +219,14 @@ td.objectmodifyname{
 .easydevform input[type="file"]{
 	font-size: 8pt;
 	border: 1px solid #AAAAAA;
-	width: 250px;
+	width: 500px;
 	margin-top: 2px;
 }
 
 .easydevform textarea{
 	font-size: 8pt;
 	border: 1px solid #AAAAAA;
-	width: 250px;
+	width: 500px;
 	height: 150px;
 }
 

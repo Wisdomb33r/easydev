@@ -9,6 +9,8 @@ require_once('parser.class.php');
 // this is done through a constant for easy reconfiguration.
 $adminMainMenu = COMPILER_MENU_ID;
 
+global $LINK;
+
 // verify that the logged user has right to see this page
 if(! $session_permissions[$adminMainMenu]){ // the user should not see this page because he do not has rights
 	header('Location: '.CONSOLE_PATH.'index.php');
@@ -23,8 +25,8 @@ else{ // if the user has the permissions
 
 		// retrieve the object defined by user from database
 		$query = 'SELECT definition FROM '.EASYDEV_OBJECTS.' WHERE id_mainmenu="'.$_GET['id'].'"';
-		$result = mysql_query($query) or die('Error while selecting definition based on id.');
-		$row = mysql_fetch_array($result);
+		$result = mysqli_query($LINK, $query) or die('Error while selecting definition based on id.');
+		$row = mysqli_fetch_array($result);
 
 		if(!$row){
 			header('Location: '.$_SERVER['PHP_SELF']);
@@ -74,8 +76,8 @@ else{ // if the user has the permissions
 			// retrieve the id of the mainmenu for this object
 			// NOTE : as one compilation process contains several objects, this id_mainmenu can be different than $_GET['id']
 			$query = 'SELECT id_mainmenu FROM '.EASYDEV_OBJECTS.' WHERE name="'.$dbobject->name.'"';
-			$result = mysql_query($query) or die('Error while selecting main menu id based on name.');
-			$row = mysql_fetch_array($result);
+			$result = mysqli_query($LINK, $query) or die('Error while selecting main menu id based on name.');
+			$row = mysqli_fetch_array($result);
 			$mainmenuid = $row['id_mainmenu'];
 
 			// for relationNM, write the scripts on disc
@@ -83,8 +85,8 @@ else{ // if the user has the permissions
 				if($field->type == 'relationNM'){
 					// get back the two menu id of the related table
 					$query = 'SELECT id_mainmenu FROM '.EASYDEV_OBJECTS.' WHERE name="'.$field->label.'"';
-					$result = mysql_query($query) or die('Error while selecting easydev object id.');
-					$row = mysql_fetch_array($result);
+					$result = mysqli_query($LINK, $query) or die('Error while selecting easydev object id.');
+					$row = mysqli_fetch_array($result);
 					$foreignid = $row['id_mainmenu'];
 
 					// if we are in the first defined object of the relation, the foreign id is not already set, so do nothing (all job done by the second object)
@@ -104,10 +106,7 @@ else{ // if the user has the permissions
 						$filepointerlocal = fopen('genscripts/objectnmrel_'.$dbobject->name.'_'.$field->label.'_'.$field->options['relationname'].'.php', 'w');
 						$filepointerforeign = fopen('genscripts/objectnmrel_'.$field->label.'_'.$dbobject->name.'_'.$field->options['relationname'].'.php', 'w');
 						if(!$filepointerlocal || !$filepointerforeign){
-							//$query = 'ROLLBACK';
-							//mysql_query($query) or die('Error while transaction rollback.');
 							array_push($errors, Translator::translate('compile_fopen_pointer_error'));
-							//$rolledback = true;
 						}
 						else{
 							fwrite($filepointerlocal, $localRelCode);
@@ -140,8 +139,6 @@ else{ // if the user has the permissions
 			$filePointerDelete = fopen('genscripts/objectdelete_'.$dbobject->name.'.php', 'w');
 			$filePointerClass = fopen('genscripts/object_'.$dbobject->name.'.class.php', 'w');
 			if(!$filePointer || !$filePointerDelete || !$filePointerClass){
-				//$query = 'ROLLBACK';
-				//mysql_query($query) or die('Error while transaction rollback.');
 				array_push($errors, Translator::translate('compile_fopen_pointer_error'));
 			}
 			else{
@@ -157,7 +154,7 @@ else{ // if the user has the permissions
 			$today = date('Y-m-d H:i');
 			$log = $today.' : Regeneration of scripts for class \"'.$dbobject->name.'\" done by '.$_SESSION[SESSION_NAME].'.';
 			$query = 'INSERT INTO '.LOGS.' (log) VALUES ("'.$log.'")';
-			mysql_query($query) or die('Error while inserting administrator log.');
+			mysqli_query($LINK, $query) or die('Error while inserting administrator log.');
 		} // end of foreach($dbobjects as $dbobject)
 
 		if(count($errors) > 0){
@@ -205,13 +202,13 @@ else{ // if the user has the permissions
 
 		// select every compilation done up to now
 		$query = 'SELECT id_mainmenu AS id, name, definition FROM '.EASYDEV_OBJECTS.' ORDER BY definition';
-		$result = mysql_query($query) or die('Error while selecting EasyDev objects.');
+		$result = mysqli_query($LINK, $query) or die('Error while selecting EasyDev objects.');
 
 		echo '<table class="form">'."\n";
 		$first = true;
 		$lastdefinition = ''; // remember the last definition
 		$lastid = 0;
-		while($row = mysql_fetch_array($result)){
+		while($row = mysqli_fetch_array($result)){
 			if($row['definition'] != $lastdefinition){
 				if(!$first){ // if this is not the first definition evaluated
 					echo '</td>'."\n";

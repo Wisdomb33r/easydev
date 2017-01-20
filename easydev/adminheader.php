@@ -16,9 +16,6 @@
 
 <table class="console">
   <tr>
-    <td class="banniere" colspan="2"></td>
-  </tr>
-  <tr>
     <td class="menu">
 <?php
 echo '      <p>'.$_SESSION[SESSION_NAME].' : [<a class="default" href="'.CONSOLE_PATH.'logout.php">'.htmlentities(Translator::translate('log_out'), ENT_COMPAT, 'UTF-8').'</a>]'
@@ -32,11 +29,13 @@ foreach($languageList as $language){
 echo '</p>'."\n";
 echo '      <ul class="adminmenu">'."\n";
 
+global $LINK;
+
 // -------------- START OF MENU GENERATION -------------------	  
 $query = 'SELECT id, text FROM '.ADMINMAIN.' ORDER BY id ASC';
-$result = mysql_query($query) or die('Error while selecting main sections.');
+$result = mysqli_query($LINK, $query) or die('Error while selecting main sections.');
 
-while($line = mysql_fetch_array($result)) {
+while($line = mysqli_fetch_array($result)) {
   if($session_permissions[$line['id']] == 1) { //if the user has permissions to see the content of the menu
 
 	// if the menu id is the one that user wants to see
@@ -45,12 +44,12 @@ while($line = mysql_fetch_array($result)) {
 	  echo '        <li class="menumain"><a href="'.CONSOLE_PATH.'index.php"><img class="adminmenu" src="'.CONSOLE_PATH.'moins.jpg" alt="fermer" /></a>'.Translator::translate($line['text']).'</li>'."\n";
 	  
 	  $query2 = 'SELECT text, url FROM '.ADMINSUB.' WHERE id_mainmenu="'.$line['id'].'"';
-	  $result2 = mysql_query($query2) or die('Error while selecting sub sections.');
+	  $result2 = mysqli_query($LINK, $query2) or die('Error while selecting sub sections.');
 	  
 	  echo '        <li class="menumain">'."\n";
 	  // print the submenu
 	  echo '          <ul class="adminsubmenu">'."\n";
-	  while($line2 = mysql_fetch_array($result2)){
+	  while($line2 = mysqli_fetch_array($result2)){
 		echo '            <li class="menusub"><a class="default" href="'.CONSOLE_PATH.$line2['url'].'.php?'.CURRENTMENU.'='.$line['id'].'">'.Translator::translate($line2['text']).'</a></li>'."\n";
 	  }
       echo '          </ul>'."\n";

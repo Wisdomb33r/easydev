@@ -9,6 +9,8 @@ require_once('includes.php');
 // this is done through a constant for easy reconfiguration.
 $adminMainMenu = ADMIN_MENU_ID;
 
+global $LINK;
+
 // verify that the logged user has right to see this page
 if(! $session_permissions[$adminMainMenu]){ // the user should not see this page because he do not has rights
   header('Location: '.CONSOLE_PATH.'index.php');
@@ -30,16 +32,16 @@ else{ // if the user has the permissions
 	if(isset($_POST['userid'])){
 	  // verify that the admin exist
 	  $query = 'SELECT name FROM '.AUTHORIZED_ADMINS.' WHERE id="'.$_POST['userid'].'"';
-	  $result = mysql_query($query) or die('Error while selecting name of administrator.');
+	  $result = mysqli_query($LINK, $query) or die('Error while selecting name of administrator.');
 
 	  // if there is no admin with this userid
-	  if(mysql_num_rows($result) == 0){
+	  if(mysqli_num_rows($result) == 0){
 		//	die('user do not exist');
 		header('Location: permissionadmin.php?'.CURRENTMENU.'='.$_GET[CURRENTMENU]);
 		exit;
 	  }
 	  else{
-		$line = mysql_fetch_array($result);
+		$line = mysqli_fetch_array($result);
 		$adminname = $line['name'];
 	  }
 	}
@@ -69,30 +71,30 @@ else{ // if the user has the permissions
 
 	  // First retrieve all the different ID of main sections
 	  $query = 'SELECT id FROM '.ADMINMAIN.' ORDER BY id ASC';
-	  $result = mysql_query($query) or die('Error while selecting main sections.');
-	  while($line = mysql_fetch_array($result)){
+	  $result = mysqli_query($LINK, $query) or die('Error while selecting main sections.');
+	  while($line = mysqli_fetch_array($result)){
 		// Create a variable which is equal to newpermission1, newpermission2... for each section
 		$variablepermission = 'newpermission'.$line['id'];
 		
 		// Now retrieve the current permission of the admin for the current menu id
 		$querypermission = 'SELECT id_mainsection FROM '.PERMISSION_ADMINS.' WHERE id_admin="'.$_POST['userid'].'" AND id_mainsection="'.$line['id'].'"';
-		$resultpermission = mysql_query($querypermission) or die('Error while selecting permission.');
+		$resultpermission = mysqli_query($LINK, $querypermission) or die('Error while selecting permission.');
 		
-		if(mysql_num_rows($resultpermission) > 0){ // The admin has right for this section
+		if(mysqli_num_rows($resultpermission) > 0){ // The admin has right for this section
 		  if(isset($_POST[$variablepermission])){ // The admin should have right for this section
 			// nothing to do
 		  }
 		  else{ // The admin should not have rights for this section
 			// Need to delete the row which make the admin having the right for this section
 			$querydeletepermission = 'DELETE FROM '.PERMISSION_ADMINS.' WHERE id_admin='.$_POST['userid'].' AND id_mainsection="'.$line['id'].'"';
-			mysql_query($querydeletepermission) or die('Error while deleting permission.');
+			mysqli_query($LINK, $querydeletepermission) or die('Error while deleting permission.');
 		  }
 		}
 		else{ // The admin has no right already for this section
 		  if(isset($_POST[$variablepermission])){ // The admin should have right for this section
 			// Need to add a row which make the admin having the right for this section
 			$queryaddpermission = 'INSERT INTO '.PERMISSION_ADMINS.' (id_admin, id_mainsection) VALUES ("'.$_POST['userid'].'", "'.$line['id'].'")';
-			$resultaddpermission = mysql_query($queryaddpermission) or die('Error while inserting new permission.');
+			$resultaddpermission = mysqli_query($LINK, $queryaddpermission) or die('Error while inserting new permission.');
 		  }
 		  else{ // The admin should not have rights for this section
 			// nothing to do
@@ -104,7 +106,7 @@ else{ // if the user has the permissions
 	  $today = date('Y-m-d H:i');
 	  $log = $today.' : New permissions for admin \"'.$adminname.'\" created by '.$_SESSION[SESSION_NAME].'.';
 	  $query = 'INSERT INTO '.LOGS.' (log) VALUES ("'.$log.'")';
-	  mysql_query($query) or die('Error while inserting administrator log.');
+	  mysqli_query($LINK, $query) or die('Error while inserting administrator log.');
 
 	  // redirect on the same page but with a message to say that admin permissions has been updated sucessfully
 	  header('Location: permissionadmin.php?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'&action=confirmPermissionChanges');
@@ -115,31 +117,31 @@ else{ // if the user has the permissions
 	if(isset($_GET['userid'])){ // if $_GET['userid'] is set
 	  // verify that the admin exist
 	  $query = 'SELECT name FROM '.AUTHORIZED_ADMINS.' WHERE id="'.$_GET['userid'].'"';
-	  $result = mysql_query($query) or die('Error while selecting name of administrator.');
+	  $result = mysqli_query($LINK, $query) or die('Error while selecting name of administrator.');
 
 	  // if there is no admin with this userid
-	  if(mysql_num_rows($result) == 0){
+	  if(mysqli_num_rows($result) == 0){
 		header('Location: permissionadmin.php?'.CURRENTMENU.'='.$_GET[CURRENTMENU]);
 		exit;
 	  }
 	  else{ // if the admin exists
 		// retrieve his name
-		$line = mysql_fetch_array($result);
+		$line = mysqli_fetch_array($result);
 		$adminname = $line['name'];
 
 		// select the current permissions of the administrator designated by $_GET['userid']
 		$query = 'SELECT id_mainsection FROM '.PERMISSION_ADMINS.' WHERE id_admin="'.$_GET['userid'].'"';
-		$resultpermissionadmin = mysql_query($query) or die('Error while selecting permissions.');
+		$resultpermissionadmin = mysqli_query($LINK, $query) or die('Error while selecting permissions.');
 
 		// create an array with these permissions
 		$permissions = array();
-		while($line = mysql_fetch_array($resultpermissionadmin)){
+		while($line = mysqli_fetch_array($resultpermissionadmin)){
 		  array_push($permissions, $line['id_mainsection']);
 		}
 
 		// select all the mainsections for which there is a permission to set
 		$query = 'SELECT id, text FROM '.ADMINMAIN.' ORDER BY id ASC';
-		$resultmainsections = mysql_query($query) or die('Error while selecting main sections.');
+		$resultmainsections = mysqli_query($LINK, $query) or die('Error while selecting main sections.');
 
 		// include the header of the page
 		include 'adminheader.php';
@@ -150,7 +152,7 @@ else{ // if the user has the permissions
 		  .'<table class="form">'."\n";
 
 		// print the permissions
-		while($line = mysql_fetch_array($resultmainsections)){
+		while($line = mysqli_fetch_array($resultmainsections)){
 		  echo '  <tr>'."\n"
 			.'    <td class="objectmodifyname">'.Translator::translate($line['text']).'</td>'."\n"
 			.'    <td><input type="checkbox" name="newpermission'.$line['id'].'"'.(in_array($line['id'], $permissions) ? ' checked="checked"' : '').' /></td>'."\n"
@@ -189,10 +191,10 @@ else{ // if the user has the permissions
 	
 	// select all administrators from database
 	$query = 'SELECT id, name FROM '.AUTHORIZED_ADMINS;
-	$result = mysql_query($query) or die('Error while selecting administratos.');
+	$result = mysqli_query($LINK, $query) or die('Error while selecting administratos.');
 
 	// print all the administratos with a link to modify their permissions
-	while($line = mysql_fetch_array($result)){
+	while($line = mysqli_fetch_array($result)){
 	  echo '  <tr>'."\n"
 		.'    <td class="objectmodifyname">'.$line['name'].'</td>'."\n"
 		.'    <td><a class="default" href="permissionadmin.php?action=changepermission&amp;userid='.$line['id'].'&amp;'.CURRENTMENU.'='.$_GET[CURRENTMENU].'">'.Translator::translate('change_permission').'</a></td>'."\n"

@@ -9,6 +9,8 @@ require_once('includes.php');
 // this is done through a constant for easy reconfiguration.
 $adminMainMenu = COMPILER_MENU_ID;
 
+global $LINK;
+
 // verify that the logged user has right to see this page
 if(! $session_permissions[$adminMainMenu]){ // the user should not see this page because he do not has rights
   header('Location: '.CONSOLE_PATH.'index.php');
@@ -30,8 +32,8 @@ else{ // if the user has the permissions
 	foreach($deleteids as $delete){
 	  // verify if a foreign key is pointing on this table
 	  $query = 'SELECT id_object FROM '.EASYDEV_OBJECTS_FOREIGN_KEY.' WHERE id_foreign_object="'.$delete.'"';
-	  $result = mysql_query($query) or die('Error while selecting foreign key.');
-	  if(mysql_num_rows($result) > 0){
+	  $result = mysqli_query($LINK, $query) or die('Error while selecting foreign key.');
+	  if(mysqli_num_rows($result) > 0){
 		// this can happens only if user manipulates the $_POST values, because the script should not allow to check such object
 		header('Location: '.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU]);
 		exit;
@@ -39,18 +41,18 @@ else{ // if the user has the permissions
 
 	  // verify if one or more linking tables is pointing on this table
 	  $query = 'SELECT id_objet1, id_objet2, table_name, relationname FROM '.EASYDEV_OBJECTS_LINKING_TABLES.' WHERE id_objet1="'.$delete.'" OR id_objet2="'.$delete.'"';
-	  $resultlt = mysql_query($query) or die('Error while selecting linking tables.');
+	  $resultlt = mysqli_query($LINK, $query) or die('Error while selecting linking tables.');
 
-	  while($line = mysql_fetch_array($resultlt)){
+	  while($line = mysqli_fetch_array($resultlt)){
 		// if there is one, retrieve the name of both objects
 		$query = 'SELECT name FROM '.EASYDEV_OBJECTS.' WHERE id_mainmenu="'.$line['id_objet1'].'"';
 		$query2 = 'SELECT name FROM '.EASYDEV_OBJECTS.' WHERE id_mainmenu="'.$line['id_objet2'].'"';
 
-		$resultobjet1 = mysql_query($query) or die('Error while selecting object name.');
-		$resultobjet2 = mysql_query($query2) or die('Error while selecting object name.');
+		$resultobjet1 = mysqli_query($LINK, $query) or die('Error while selecting object name.');
+		$resultobjet2 = mysqli_query($LINK, $query2) or die('Error while selecting object name.');
 
-		$line1 = mysql_fetch_array($resultobjet1);
-		$line2 = mysql_fetch_array($resultobjet2);
+		$line1 = mysqli_fetch_array($resultobjet1);
+		$line2 = mysqli_fetch_array($resultobjet2);
 		
 		$obj1name = $line1['name'];
 		$obj2name = $line2['name'];
@@ -61,17 +63,17 @@ else{ // if the user has the permissions
 
 		// remove the table of the relation
 		$query = 'DROP TABLE IF EXISTS '.$line['table_name'];
-		mysql_query($query) or die('Error while dropping object relation table.');
+		mysqli_query($LINK, $query) or die('Error while dropping object relation table.');
 	  }
 
 	  // start a transaction to protect the different queries
 	  $query = 'START TRANSACTION';
-	  mysql_query($query) or die('Error while starting transaction.');
+	  mysqli_query($LINK, $query) or die('Error while starting transaction.');
 
 	  // retrieve the name of the object
 	  $query = 'SELECT name FROM '.EASYDEV_OBJECTS.' WHERE id_mainmenu="'.$delete.'"';
-	  $result = mysql_query($query) or die('Error while selecting object name.');
-	  $line = mysql_fetch_array($result);
+	  $result = mysqli_query($LINK, $query) or die('Error while selecting object name.');
+	  $line = mysqli_fetch_array($result);
 	  $objectname = $line['name'];
 	  
 	  // verify if there was a directory with images for this object
@@ -81,13 +83,13 @@ else{ // if the user has the permissions
 
 	  // delete the mainmenu for the objects
 	  $query = 'DELETE FROM '.ADMINMAIN.' WHERE id="'.$delete.'"';
-	  mysql_query($query) or die('Error while deleting main menu section.');
+	  mysqli_query($LINK, $query) or die('Error while deleting main menu section.');
 
 	  // remove the object table
 	  // WARNING : MySQL makes an AUTOCOMMIT when executing the statement that create, drop or alter tables.
 	  // Here the commit is done through the DROP TABLE statement.
 	  $query = 'DROP TABLE IF EXISTS object_'.$objectname;
-	  mysql_query($query) or die('Error while dropping object table.');
+	  mysqli_query($LINK, $query) or die('Error while dropping object table.');
 
 	  // remove all the generated scripts
 	  if(file_exists('genscripts/objectadd_'.$objectname.'.php')) unlink('genscripts/objectadd_'.$objectname.'.php');
@@ -98,7 +100,7 @@ else{ // if the user has the permissions
 	  $today = date('Y-m-d H:i');
 	  $log = $today.' : Suppression of class \"'.$objectname.'\" by '.$_SESSION[SESSION_NAME].'.';
 	  $query = 'INSERT INTO '.LOGS.' (log) VALUES ("'.$log.'")';
-	  mysql_query($query) or die('Error while inserting administrator log.');
+	  mysqli_query($LINK, $query) or die('Error while inserting administrator log.');
 	}
 
 	// redirect on the same page with a confirmation message of the delete
@@ -116,28 +118,28 @@ else{ // if the user has the permissions
 
 	// select all easydev objects currently in the database
 	$query = 'SELECT id_mainmenu, name FROM '.EASYDEV_OBJECTS.' ORDER BY id_mainmenu ASC';
-	$result = mysql_query($query) or die('Error while selecting objects list.');
+	$result = mysqli_query($LINK, $query) or die('Error while selecting objects list.');
 	
 	// print the HTML form to delete objects in the database
 	echo '<p class="largemargintop">'.htmlentities(Translator::translate('console_remove_objects_header'), ENT_COMPAT, 'UTF-8').'</p>'."\n"
 	  .'<form action="'.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'" method="post">'."\n"
 	  .'<table class="form">'."\n";
 
-	while($line = mysql_fetch_array($result)){
+	while($line = mysqli_fetch_array($result)){
 	  // verify if a foreign key is pointing on this table
 	  $query = 'SELECT id_object FROM '.EASYDEV_OBJECTS_FOREIGN_KEY.' WHERE id_foreign_object="'.$line['id_mainmenu'].'"';
-	  $resultfk = mysql_query($query) or die('Error while selecting foreign key constraint.');
+	  $resultfk = mysqli_query($LINK, $query) or die('Error while selecting foreign key constraint.');
 
 	  // verify if a relation table is pointing on this table
 	  $query = 'SELECT table_name FROM '.EASYDEV_OBJECTS_LINKING_TABLES.' WHERE id_objet1="'.$line['id_mainmenu'].'" OR id_objet2="'.$line['id_mainmenu'].'"';
-	  $resultlt = mysql_query($query) or die('Error while selecting linking tables constraint.');
+	  $resultlt = mysqli_query($LINK, $query) or die('Error while selecting linking tables constraint.');
 
 	  echo '  <tr>'."\n";
-	  if(mysql_num_rows($resultfk) > 0){
+	  if(mysqli_num_rows($resultfk) > 0){
 		echo '    <td></td>'."\n";
 		echo '    <td>'.$line['name'].' *</td>'."\n";
 	  }
-	  else if(mysql_num_rows($resultlt) > 0){
+	  else if(mysqli_num_rows($resultlt) > 0){
 		echo '    <td><input class="checkboxinput" type="checkbox" name="deleteids[]" value="'.$line['id_mainmenu'].'" /></td>'."\n";
 		echo '    <td>'.$line['name'].' **</td>'."\n";
 	  }

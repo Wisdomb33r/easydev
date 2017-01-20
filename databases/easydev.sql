@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- Host: localhost
--- Generation Time: Oct 03, 2014 at 12:19 PM
+-- Generation Time: Jan 20, 2017 at 12:19 PM
 -- Server version: 5.0.41
 -- PHP Version: 5.2.3
 
@@ -106,7 +106,7 @@ CREATE TABLE `configuration` (
 
 INSERT INTO `configuration` (`id`, `value`) VALUES 
 ('default_language', 'fr'),
-('version', '2.2');
+('version', '2.3');
 
 -- --------------------------------------------------------
 

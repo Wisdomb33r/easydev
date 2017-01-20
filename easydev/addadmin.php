@@ -9,6 +9,8 @@ require_once('includes.php');
 // this is done through a constant for easy reconfiguration.
 $adminMainMenu = ADMIN_MENU_ID;
 
+global $LINK;
+
 // verify that the logged user has right to see this page
 if(! $session_permissions[$adminMainMenu]){ // the user should not see this page because he do not has rights
   header('Location: '.CONSOLE_PATH.'index.php');
@@ -35,8 +37,8 @@ else{ // if the user has the permissions
 
 	// verify that no other admin has exactly the same name than this one
 	$query = 'SELECT id FROM '.AUTHORIZED_ADMINS.' WHERE name="'.$_POST['Name'].'"';
-	$result = mysql_query($query) or die('Could not select admins in database');
-	if($line = mysql_fetch_array($result)){
+	$result = mysqli_query($LINK, $query) or die('Could not select admins in database');
+	if($line = mysqli_fetch_array($result)){
 	  array_push($errors, Translator::translate('console_duplicate_admin_username_error'));
 	}
 	
@@ -64,12 +66,12 @@ else{ // if the user has the permissions
 	else{ // if there is no errors
 	  // store the admin in the database
 	  $query = 'INSERT INTO '.AUTHORIZED_ADMINS.' (name, password) VALUES ("'.$_POST['Name'].'", "'.sha1($_POST['Pass']).'")';
-	  mysql_query($query) or die('Error while inserting new administrator into database.');
+	  mysqli_query($LINK, $query) or die('Error while inserting new administrator into database.');
 
 	  $today = date('Y-m-d H:i');
 	  $log = $today.' : New administrator with name \"'.$_POST['Name'].'\" inserted by '.$_SESSION[SESSION_NAME].'.';
 	  $query = 'INSERT INTO '.LOGS.' (log) VALUES ("'.$log.'")';
-	  mysql_query($query) or die('Error while inserting administrator log.');
+	  mysqli_query($LINK, $query) or die('Error while inserting administrator log.');
 	  
 	  // redirect on the same page but with a message to say that admin has been successfully entered in the database
 	  header('Location: addadmin.php?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'&action=confirmAdminAdd');

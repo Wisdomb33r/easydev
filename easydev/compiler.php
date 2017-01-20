@@ -4,6 +4,7 @@
 require_once('includes.php');
 require_once('tokenizer.class.php');
 require_once('parser.class.php');
+global $LINK;
 
 // first set a variable to indicate to which "mainmenu" this script belongs to in the administration console.
 // this is done through a constant for easy reconfiguration.
@@ -64,10 +65,10 @@ else{ // if the user has the permissions
 		foreach($dbobjects as $object){
 			$query .= 'OR name="'.$object->name.'" ';
 		}
-		$result = mysql_query($query) or die('Error while verifying duplicate entry in database.');
+		$result = mysqli_query($LINK, $query) or die('Error while verifying duplicate entry in database.');
 
 		// if the number of objects returned is greater than 0, there is a conflict with database
-		if(mysql_num_rows($result) > 0){
+		if(mysqli_num_rows($result) > 0){
 			$errors = array();
 			array_push($errors, Translator::translate('compile_database_duplicate_object_error'));
 			$_SESSION[SESSION_ERRORS] = $errors;
@@ -85,45 +86,45 @@ else{ // if the user has the permissions
 		foreach($dbobjects as $dbobject){
 			// open a transaction to protect all the different database inserts
 			$query = 'START TRANSACTION';
-			mysql_query($query) or die('Error while starting transaction.');
+			mysqli_query($LINK, $query) or die('Error while starting transaction.');
 
 			// create a new menu for the new object
 			$query = 'INSERT INTO '.ADMINMAIN.' (text) VALUES ("'
 			.$dbobject->name.'")';
-			mysql_query($query) or die('Error while inserting new main menu entry.');
+			mysqli_query($LINK, $query) or die('Error while inserting new main menu entry.');
 
 			// retrieve the id of the main menu
 			$query = 'SELECT LAST_INSERT_ID()';
-			$result = mysql_query($query) or die('Error while selecting last insert id.');
-			$line = mysql_fetch_row($result);
+			$result = mysqli_query($LINK, $query) or die('Error while selecting last insert id.');
+			$line = mysqli_fetch_row($result);
 			$mainmenuid = $line[0];
 
 			// insert the object in the object list in database
 			$query = 'INSERT INTO '.EASYDEV_OBJECTS.' (id_mainmenu, name, definition) VALUES ("'.$mainmenuid.'", "'
 			.$dbobject->name.'", "'.addslashes($dbobject->usertextdef).'")'; // because we removed the slashes added on this variable, now need to add it
-			mysql_query($query) or die('Error while inserting new easydev object.');
+			mysqli_query($LINK, $query) or die('Error while inserting new easydev object.');
 
 			// create a new sub menu for the add page of the new object
 			$query = 'INSERT INTO '.ADMINSUB.' (id_mainmenu, text, url) VALUES ("'.$mainmenuid.'", "compile_add_object_sub_menu_title", "genscripts/objectadd_'.$dbobject->name.'")';
-			mysql_query($query) or die('Error while inserting new sub menu entry.');
+			mysqli_query($LINK, $query) or die('Error while inserting new sub menu entry.');
 
 			// create a new sub menu for the delete page of the new object
 			$query = 'INSERT INTO '.ADMINSUB.' (id_mainmenu, text, url) VALUES ("'.$mainmenuid.'", "compile_delete_object_sub_menu_title", "genscripts/objectdelete_'.$dbobject->name.'")';
-			mysql_query($query) or die('Error while inserting new sub menu entry.');
+			mysqli_query($LINK, $query) or die('Error while inserting new sub menu entry.');
 
 			// for relation1N, register the foreign key into easydev_objects_foreign_key
 			foreach($dbobject->fieldlist as $field){
 				if($field->type == 'relation1N'){
 					// get back the id of the object identified as foreign object
 					$query = 'SELECT id_mainmenu FROM '.EASYDEV_OBJECTS.' WHERE name="'.$field->label.'"';
-					$result = mysql_query($query) or die('Error while selecting easydev object id.');
+					$result = mysqli_query($LINK, $query) or die('Error while selecting easydev object id.');
 
 					// there can be one and only one result
-					$row = mysql_fetch_array($result);
+					$row = mysqli_fetch_array($result);
 
 					// update easydev_objects_foreign_key
 					$query = 'INSERT INTO '.EASYDEV_OBJECTS_FOREIGN_KEY.' (id_object, id_foreign_object, relationname) VALUES ("'.$mainmenuid.'", "'.$row['id_mainmenu'].'", "'.$field->options['relationname'].'")';
-					mysql_query($query) or die('Error while inserting foreign key entry.');
+					mysqli_query($LINK, $query) or die('Error while inserting foreign key entry.');
 				}
 			}
 
@@ -133,8 +134,8 @@ else{ // if the user has the permissions
 				if($field->type == 'relationNM'){
 					// get back the two menu id of the related table
 					$query = 'SELECT id_mainmenu FROM '.EASYDEV_OBJECTS.' WHERE name="'.$field->label.'"';
-					$result = mysql_query($query) or die('Error while selecting easydev object id.');
-					$row = mysql_fetch_array($result);
+					$result = mysqli_query($LINK, $query) or die('Error while selecting easydev object id.');
+					$row = mysqli_fetch_array($result);
 					$foreignid = $row['id_mainmenu'];
 
 					// if we are in the first defined object of the relation, the foreign id is not already set, so do nothing (all job done by the second object)
@@ -142,16 +143,16 @@ else{ // if the user has the permissions
 						// register the linking table
 						$query = 'INSERT INTO '.EASYDEV_OBJECTS_LINKING_TABLES.' (id_objet1, id_objet2, table_name, relationname) '
 						.'VALUES ("'.$foreignid.'", "'.$mainmenuid.'", "object_'.$field->label.'_'.$dbobject->name.'_'.$field->options['relationname'].'_nmrelation", "'.$field->options['relationname'].'")';
-						mysql_query($query) or die('Error while inserting relational table entry.');
+						mysqli_query($LINK, $query) or die('Error while inserting relational table entry.');
 							
 						// add the two new submenu
 						$query = 'INSERT INTO '.ADMINSUB.' (id_mainmenu, text, url) VALUES ("'.$mainmenuid.'", "<-> '.$field->label.' ('.$field->options['relationname'].')", '.
 								'"genscripts/objectnmrel_'.$dbobject->name.'_'.$field->label.'_'.$field->options['relationname'].'")';
-						mysql_query($query) or die('Error while inserting new sub menu entry.');
+						mysqli_query($LINK, $query) or die('Error while inserting new sub menu entry.');
 							
 						$query = 'INSERT INTO '.ADMINSUB.' (id_mainmenu, text, url) VALUES ("'.$foreignid.'", "<-> '.$dbobject->name.' ('.$field->options['relationname'].')", '.
 								'"genscripts/objectnmrel_'.$field->label.'_'.$dbobject->name.'_'.$field->options['relationname'].'")';
-						mysql_query($query) or die('Error while inserting new sub menu entry.');
+						mysqli_query($LINK, $query) or die('Error while inserting new sub menu entry.');
 							
 						// find the foreign object
 						$foreignobject = null;
@@ -167,7 +168,7 @@ else{ // if the user has the permissions
 						if(file_exists('genscripts/objectnmrel_'.$field->label.'_'.$dbobject->name.'_'.$field->options['relationname'].'.php')
 						|| file_exists('genscripts/objectnmrel_'.$dbobject->name.'_'.$field->label.'_'.$field->options['relationname'].'.php')){
 							$query = 'ROLLBACK';
-							mysql_query($query) or die('Error while transaction rollback.');
+							mysqli_query($LINK, $query) or die('Error while transaction rollback.');
 							array_push($errors, Translator::translate('compile_autogenerated_page_exist_error'));
 							$rolledback = true;
 						}
@@ -176,7 +177,7 @@ else{ // if the user has the permissions
 							$filepointerforeign = fopen('genscripts/objectnmrel_'.$field->label.'_'.$dbobject->name.'_'.$field->options['relationname'].'.php', 'w');
 							if(!$filepointerlocal || !$filepointerforeign){
 								$query = 'ROLLBACK';
-								mysql_query($query) or die('Error while transaction rollback.');
+								mysqli_query($LINK, $query) or die('Error while transaction rollback.');
 								array_push($errors, Translator::translate('compile_fopen_pointer_error'));
 								$rolledback = true;
 							}
@@ -214,7 +215,7 @@ else{ // if the user has the permissions
 				|| file_exists('genscripts/objectdelete_'.$dbobject->name.'.php')
 				|| file_exists('genscripts/object_'.$dbobject->name.'.class.php')){
 					$query = 'ROLLBACK';
-					mysql_query($query) or die('Error while transaction rollback.');
+					mysqli_query($LINK, $query) or die('Error while transaction rollback.');
 					array_push($errors, Translator::translate('compile_autogenerated_page_exist_error'));
 				}
 				else{
@@ -223,7 +224,7 @@ else{ // if the user has the permissions
 					$filePointerClass = fopen('genscripts/object_'.$dbobject->name.'.class.php', 'w');
 					if(!$filePointer || !$filePointerDelete || !$filePointerClass){
 						$query = 'ROLLBACK';
-						mysql_query($query) or die('Error while transaction rollback.');
+						mysqli_query($LINK, $query) or die('Error while transaction rollback.');
 						array_push($errors, Translator::translate('compile_fopen_pointer_error'));
 					}
 					else{
@@ -251,14 +252,14 @@ else{ // if the user has the permissions
 				// transform the different objects into SQL statements
 				$querylist = $dbobject->sqltransform();
 				foreach($querylist as $query){
-					mysql_query($query) or die('Error while object SQL execution.');
+					mysqli_query($LINK, $query) or die('Error while object SQL execution.');
 				}
 
 				// insert the log
 				$today = date('Y-m-d H:i');
 				$log = $today.' : New class with name \"'.$dbobject->name.'\" compiled by '.$_SESSION[SESSION_NAME].'.';
 				$query = 'INSERT INTO '.LOGS.' (log) VALUES ("'.$log.'")';
-				mysql_query($query) or die('Error while inserting administrator log.');
+				mysqli_query($LINK, $query) or die('Error while inserting administrator log.');
 			}
 		} // end of foreach($dbobjects as $dbobject)
 

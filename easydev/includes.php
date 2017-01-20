@@ -7,6 +7,8 @@ require_once('includes/dbconstants.php');
 
 session_start();
 
+global $LINK;
+
 // global usage functions
 function rrmdir($dir) {
 	if (is_dir($dir)) {
@@ -46,19 +48,19 @@ if(isset($_SESSION[SESSION_LOGIN])){ // if there is a user login in the session
 
 	// get the id's of all "main" sections
 	$query = 'SELECT id FROM '.ADMINMAIN;
-	$result = mysql_query($query) or die('Error while selecting main section list ');
+	$result = mysqli_query($LINK, $query) or die('Error while selecting main section list ');
 
 	// default initialization of all permissions to "false"
-	while($row = mysql_fetch_array($result)){
+	while($row = mysqli_fetch_array($result)){
 		$session_permissions[$row['id']] = 0;
 	}
 
 	// get all permissions for all the main sections
 	$query = 'SELECT id_mainsection FROM '.PERMISSION_ADMINS.' WHERE id_admin="'.$_SESSION[SESSION_LOGIN].'"';
-	$result = mysql_query($query) or die('Error while selecting admin permissions.');
+	$result = mysqli_query($LINK, $query) or die('Error while selecting admin permissions.');
 
 	// update the $session_permissions array
-	while($row = mysql_fetch_array($result)){
+	while($row = mysqli_fetch_array($result)){
 		$session_permissions[$row['id_mainsection']] = 1;
 	}
 }

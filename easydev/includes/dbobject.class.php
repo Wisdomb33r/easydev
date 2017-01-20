@@ -40,7 +40,7 @@ class dbobject{
   }
   
   /* Transform the class into a SQL CREATE TABLE query to create the table
-   * WARNING : mysql_query do not support multiple request into the same function call.
+   * WARNING : mysqli_query do not support multiple request into the same function call.
    * I need to return an array of request to execute consecutively by the caller.
    * @return array An array of strings containing the different queries to execute by the caller.
    */
@@ -58,7 +58,7 @@ class dbobject{
 		$ret .= '1n_rel_'.$field->options['relationname'].' int(10) unsigned '.(isset($field->options['nullable']) && $field->options['nullable'] ? '' : 'NOT').' NULL,'."\n";
 		break;
 	  case 'string':
-		$ret .= $field->label.' varchar(255) collate utf8_general_ci NULL,'."\n";
+		$ret .= $field->label.' varchar(1000) collate utf8_general_ci NULL,'."\n";
 		break;
 	  case 'bool':
 		$ret .= $field->label.' tinyint(1) NULL,'."\n";

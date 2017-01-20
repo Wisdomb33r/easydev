@@ -4,6 +4,7 @@ require_once('includes/connection.php');
 require_once('includes/translator.class.php');
 require_once('includes/constants.php');
 require_once('includes/dbconstants.php');
+global $LINK;
 
 // render the login page
 echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'."\n";
@@ -18,8 +19,8 @@ echo '</head>'."\n";
 echo '<body>'."\n";
 
 $query = 'SELECT value FROM '.CONFIGURATION.' WHERE id="version"';
-$result = mysql_query($query) or die('Error While selecting console version.');
-$row = mysql_fetch_array($result);
+$result = mysqli_query($LINK, $query) or die('Error While selecting console version.');
+$row = mysqli_fetch_array($result);
 $currentVersion = $row['value'];
 
 echo '<form action="log.php" method="post">'."\n";
@@ -31,8 +32,8 @@ echo '  <tr>'."\n";
 echo '	  <td colspan="2" class="logheader">'.htmlentities(Translator::translate('language'), ENT_COMPAT, 'UTF-8').' : ';
 
 $query = 'SELECT tag FROM '.TRANSLATION_LANGUAGES;
-$result = mysql_query($query) or die('Error while selecting tags from translation tables.');
-while($line = mysql_fetch_array($result)){
+$result = mysqli_query($LINK, $query) or die('Error while selecting tags from translation tables.');
+while($line = mysqli_fetch_array($result)){
   echo '<a class="default" href="index.php?'.SESSION_LANGUAGE.'='.$line['tag'].'">'.$line['tag'].'</a> ';
 }
 echo '</td>'."\n";

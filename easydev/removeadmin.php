@@ -9,6 +9,8 @@ require_once('includes.php');
 // this is done through a constant for easy reconfiguration.
 $adminMainMenu = ADMIN_MENU_ID;
 
+global $LINK;
+
 // verify that the logged user has right to see this page
 if(! $session_permissions[$adminMainMenu]){ // the user should not see this page because he do not has rights
   header('Location: '.CONSOLE_PATH.'index.php');
@@ -28,18 +30,18 @@ else{ // if the user has the permissions
 	// NOTE : as all permissions, logs and personal info are sql links with InnoDB with "ON DELETE = cascade", no need to remove in other tables
 	foreach($_POST['deleteids'] as $delete){
 	  $query = 'SELECT name FROM '.AUTHORIZED_ADMINS.' WHERE ID="'.$delete.'"';
-	  $result = mysql_query($query) or die('Error while selecting name of admin.');
-	  $line = mysql_fetch_array($result);
+	  $result = mysqli_query($LINK, $query) or die('Error while selecting name of admin.');
+	  $line = mysqli_fetch_array($result);
 	  $adminname = $line['name'];
 
 	  $query = 'DELETE FROM '.AUTHORIZED_ADMINS.' WHERE id="'.$delete.'"';
-	  mysql_query($query) or die('Error while deleting admin.');
+	  mysqli_query($LINK, $query) or die('Error while deleting admin.');
 
 	  // insert the log
 	  $today = date('Y-m-d H:i');
 	  $log = $today.' : Suppression of admin \"'.$adminname.'\" by '.$_SESSION[SESSION_NAME].'.';
 	  $query = 'INSERT INTO '.LOGS.' (log) VALUES ("'.$log.'")';
-	  mysql_query($query) or die('Error while inserting administrator log.');
+	  mysqli_query($LINK, $query) or die('Error while inserting administrator log.');
 	}
 
 	// redirect on the same page with a confirmation message of the delete
@@ -57,14 +59,14 @@ else{ // if the user has the permissions
 
 	// select all administrators
 	$query = 'SELECT id, name FROM '.AUTHORIZED_ADMINS.' ORDER BY id ASC';
-	$result = mysql_query($query) or die('Error while selecting admin list.');
+	$result = mysqli_query($LINK, $query) or die('Error while selecting admin list.');
 	
 	// print the HTML form to delete administrators in the database
 	echo '<p class="largemargintop">'.htmlentities(Translator::translate('console_remove_admin_header'), ENT_COMPAT, 'UTF-8').'</p>'."\n"
 	  .'<form action="'.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'" method="post">'."\n"
 	  .'<table class="form">'."\n";
 
-	while($line = mysql_fetch_array($result)){
+	while($line = mysqli_fetch_array($result)){
 	  echo '  <tr>'."\n"
 		.'    <td>'
 		.($_SESSION[SESSION_LOGIN] != $line['id'] ? 

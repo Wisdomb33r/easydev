@@ -9,6 +9,8 @@ require_once('includes.php');
 // this is done through a constant for easy reconfiguration.
 $adminMainMenu = CONFIG_MENU_ID;
 
+global $LINK;
+
 // verify that the logged user has right to see this page
 if(! $session_permissions[$adminMainMenu]){ // the user should not see this page because he do not has rights
   header('Location: '.CONSOLE_PATH.'index.php');
@@ -42,7 +44,7 @@ else{ // if the user has the permissions
 	else{ // if there is no errors
 	  // store the admin in the database
 	  $query = 'UPDATE '.CONFIGURATION.' SET value="'.$_POST['default_language'].'" WHERE id="default_language"';
-	  mysql_query($query) or die('Error while updating default language.');
+	  mysqli_query($LINK, $query) or die('Error while updating default language.');
 	  
 	  // redirect on the same page but with a message to say that config has been properly changed
 	  header('Location: '.$_SERVER['PHP_SELF'].'?'.CURRENTMENU.'='.$_GET[CURRENTMENU].'&action=confirmConfigModif');
@@ -88,12 +90,12 @@ else{ // if the user has the permissions
 	  .'    <td>'.htmlentities(Translator::translate('default_language'), ENT_COMPAT, 'UTF-8').' : </td>'."\n"
 	  .'    <td><select class="selectinput" name="default_language">'."\n";
 	$query = 'SELECT value FROM '.CONFIGURATION.' WHERE id="default_language"';
-	$result = mysql_query($query) or die('Error while selecting default language configuration.');
-	$row = mysql_fetch_array($result);
+	$result = mysqli_query($LINK, $query) or die('Error while selecting default language configuration.');
+	$row = mysqli_fetch_array($result);
 
 	$query = 'SELECT language, tag FROM '.TRANSLATION_LANGUAGES;
-	$result = mysql_query($query) or die('Error while selecting language list.');
-	while($line = mysql_fetch_array($result)){
+	$result = mysqli_query($LINK, $query) or die('Error while selecting language list.');
+	while($line = mysqli_fetch_array($result)){
 	  echo '      <option value="'.$line['tag'].'"'.($line['tag'] == $row['value'] ? ' selected="selected"' : '').'>'.$line['language'].'</option>'."\n";
 	}
 	  echo '        </td>'."\n"

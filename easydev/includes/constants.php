@@ -1,7 +1,7 @@
 <?php
 
 // regexp for compiler to verify the validity of the user object code
-define('COMPILER_ACCEPTED_CHAR'     , '/^[a-zA-Z0-9_\.\<\>\,\=\*\(\)\"\s\{\};!]+$/');
+define('COMPILER_ACCEPTED_CHAR'     , '/^[a-zA-Z0-9_\.\/\<\>\,\=\*\(\)\"\s\{\};!]+$/');
 define('CLASSNAME_REGEXP'           , '/^[a-zA-Z]([a-zA-Z0-9_]*[a-zA-Z0-9]+)*$/');
 define('FIELDNAME_REGEXP'           , '/^[a-zA-Z]([a-zA-Z0-9_]*[a-zA-Z0-9]+)*$/');
 define('USERNAME_ACCEPTED_CHARS'    , '/^[a-zA-Z0-9àáâäèéêëíìîïóòöôúùüû]+$/');
