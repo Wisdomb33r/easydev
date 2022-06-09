@@ -27,13 +27,6 @@ function recursive_stripslashes($value){
 	return $value;
 }
 
-// handle the case when magic quotes are activated by removing all the backslashes in GPC
-if(get_magic_quotes_gpc()){
-	$_POST = recursive_stripslashes($_POST);
-	$_GET = recursive_stripslashes($_GET);
-	$_COOKIE = recursive_stripslashes($_COOKIE);
-}
-
 // find the list of available languages
 $languageList = Translator::languageList();
 
