@@ -132,14 +132,14 @@ else{ // if the user has the permissions
 			// for relationNM, register the linking table into easydev_objects_linking_tables
 			foreach($dbobject->fieldlist as $field){
 				if($field->type == 'relationNM'){
-					// get back the two menu id of the related table
-					$query = 'SELECT id_mainmenu FROM '.EASYDEV_OBJECTS.' WHERE name="'.$field->label.'"';
-					$result = mysqli_query($LINK, $query) or die('Error while selecting easydev object id.');
-					$row = mysqli_fetch_array($result);
-					$foreignid = $row['id_mainmenu'];
-
 					// if we are in the first defined object of the relation, the foreign id is not already set, so do nothing (all job done by the second object)
 					if(isset($field->options['secondobject']) && $field->options['secondobject']){
+                        // get back the menu id of the related table
+                        $query = 'SELECT id_mainmenu FROM '.EASYDEV_OBJECTS.' WHERE name="'.$field->label.'"';
+                        $result = mysqli_query($LINK, $query) or die('Error while selecting easydev object id.');
+                        $row = mysqli_fetch_array($result);
+                        $foreignid = $row['id_mainmenu'];
+
 						// register the linking table
 						$query = 'INSERT INTO '.EASYDEV_OBJECTS_LINKING_TABLES.' (id_objet1, id_objet2, table_name, relationname) '
 						.'VALUES ("'.$foreignid.'", "'.$mainmenuid.'", "object_'.$field->label.'_'.$dbobject->name.'_'.$field->options['relationname'].'_nmrelation", "'.$field->options['relationname'].'")';

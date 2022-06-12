@@ -703,6 +703,7 @@ foreach($this->fieldlist as $field){
      * Delete the images from disk for this object.
      */
 	protected function removeImage<% echo $field->label; %>(){
+	  if($this-><% echo $field->label; %>){
       $paddedIdentifier = str_pad($this->id, 9, '0', STR_PAD_LEFT);
       $d1 = substr($paddedIdentifier, 0, 3);
       $d2 = substr($paddedIdentifier, 3, 3);
@@ -716,6 +717,7 @@ foreach($this->fieldlist as $field){
             }
           }
         }
+      }
 	  }
 	}<%
 	}
