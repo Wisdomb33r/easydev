@@ -352,6 +352,8 @@ INSERT INTO `translation_strings` (`keyword`, `fr`, `en`) VALUES
 ('generator_add_object_pass_and_confirm_not_identical_error', 'Le mot de passe et sa confirmation doivent être identique pour le champ : ', 'The password and its confirmation must be equal for the field : '),
 ('generator_add_object_pass_length_error', 'Ce mot de passe doit contenir au moins 8 caractères : ', 'This password should contains at least 8 characters : '),
 ('generator_add_object_pass_unset_error', 'Veuillez indiquer un mot de passe pour le champ ', 'Please enter a password for the field '),
+('generator_add_object_image_too_width', 'Largeur maximale dépassée pour l''image : ', 'Max width exceeded for image : '),
+('generator_add_object_image_too_height', 'Hauteur maximale dépassée pour l''image : ', 'Max height exceeded for image : '),
 ('generator_add_page_submit_button', 'Ajouter', 'Add'),
 ('generator_add_page_title', 'Ajouter un objet dans la base de données', 'Add an object into the database'),
 ('generator_confirm_insert', 'L''objet a été correctement inséré dans la base de données.', 'The object has been successfully added to the database.'),
