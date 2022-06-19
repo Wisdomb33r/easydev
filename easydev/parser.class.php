@@ -53,6 +53,14 @@ class parser{
 		}
 	}
 
+  /**
+   * Verify if the current token has string type.
+   * @return bool True if the current token has string type, false otherwise.
+   */
+  private function isStringType() {
+    return $this->tokenslist[$this->currenttoken] == 'string';
+  }
+
 	/*
 	 * Verify that the current token is the "nullable" special keyword.
 	 * @return bool True if the current token is "nullable" special keyword, false otherwise.
@@ -290,11 +298,17 @@ class parser{
 
 				// verify there is at least one field object
 				if($this->isTypeToken()){
+          $nbStringFields = 0;
 					while($this->isTypeToken()){
 						// initialize two variables for name and type of the field
 						$fieldname = '';
 						$fieldtype = '';
 						$fieldoptions = array();
+
+            // count the number of string fields
+            if ($this->isStringType()) {
+              $nbStringFields++;
+            }
 
 						// accept the type token
 						$fieldtype = $this->tokenslist[$this->currenttoken];
@@ -335,6 +349,12 @@ class parser{
 						$fieldobject = new field($fieldname, $fieldtype, $fieldoptions);
 						array_push($fieldslist, $fieldobject);
 					}
+
+          // verify if there is too much string types
+          if ($nbStringFields > MAX_NUMBER_STRING_FIELDS) {
+            array_push($this->errorslist, Translator::translate('compile_max_string_fields_number_error') . $classname);
+            return array();
+          }
 				}
 				else{
 					array_push($this->errorslist, Translator::translate('compile_no_field_def_found_error').$classname);

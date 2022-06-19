@@ -1399,7 +1399,7 @@ foreach($textfields as $textfield){
   		$imageinfos = getimagesize($_FILES[$name]['tmp_name']);
   		if(is_array($imageinfos) && count($imageinfos)){
   			if($imageinfos[0] > MAX_IMAGE_WIDTH) $this->errors[] = Translator::translate('generator_add_object_image_too_width').$name;
-  			if($imageinfos[1] > MAX_IMAGE_HEIGTH) $this->errors[] = Translator::translate('generator_add_object_image_too_height').$name;
+  			if($imageinfos[1] > MAX_IMAGE_HEIGHT) $this->errors[] = Translator::translate('generator_add_object_image_too_height').$name;
   			$imagetype = $imageinfos[2];
   			switch($imagetype){
   				case IMAGETYPE_GIF:

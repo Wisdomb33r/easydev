@@ -1,0 +1,2 @@
+INSERT INTO `translation_strings` (`keyword`, `fr`, `en`) VALUES ('compile_max_string_fields_number_error', 'Nombre maximal de champs de type string dépassé dans la classe : ', 'Max number of string fields exceeded in class :');
+UPDATE `configuration` SET `value` = '2.4' WHERE `configuration`.`id` = 'version';
