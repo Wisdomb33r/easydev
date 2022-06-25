@@ -339,13 +339,22 @@ foreach($this->fieldlist as $field){
         $this->errors[] = Translator::translate('generator_add_object_boolean_unset').'<% echo $field->label;%>';<%
     break;
   case 'date': %>
-  	$exploded = explode('-', $this-><% echo $field->label; %>);
-    if(count($exploded) != 3 || $exploded[0] < 1901 || $exploded[0] > 2038 || $exploded[1] > 12 || $exploded[1] < 1 || $exploded[2] > 31 || $exploded[2] < 1){<%
-    if(isset($field->options['nullable']) && $field->options['nullable']){ %>
-      if(isset($this-><% echo $field->label; %>) && $this-><% echo $field->label; %> !== '')<%
-    }%>
+    if($this-><% echo $field->label; %>) {
+      $parsedDate = DateTimeImmutable::createFromFormat('Y-m-d', $this-><% echo $field->label; %>);
+      if(!$parsedDate){
         $this->errors[] = Translator::translate('generator_add_object_date_format_error').'<% echo $field->label;%>';
+      } else {
+        $reformattedDate = $parsedDate->format('Y-m-d');
+        if($reformattedDate !== $this-><% echo $field->label; %>){
+          $this->errors[] = Translator::translate('generator_add_object_date_format_error').'<% echo $field->label;%>';
+        }
+      }
     }<%
+    if(!isset($field->options['nullable']) || !$field->options['nullable']){ %>
+    else {
+      $this->errors[] = Translator::translate('generator_add_object_date_empty_error').'<% echo $field->label;%>';
+    }<%
+  	}
     break;
   case 'datetime': %>
     $expl = explode('-', $this-><% echo $field->label; %>date);
