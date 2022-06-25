@@ -1348,7 +1348,7 @@ foreach($textfields as $textfield){
     if(isset($_FILES[$name]) && $_FILES[$name]['error'] == 0){
     	$pointpos = strrpos($_FILES[$name]['name'], '.');
     	$lastpos = strlen($_FILES[$name]['name']) - 1;
-    	if($pointpos === false || $pointpos == $lastpos) $this->errors[] = Translator::translate('generator_add_object_file_no_extension').$file;
+    	if($pointpos === false || $pointpos == $lastpos) $this->errors[] = Translator::translate('generator_add_object_file_no_extension').$name;
     	else{
     		$temp_extension_var = $name.'_temp_file_extension';
 	    	$this->$temp_extension_var = substr($_FILES[$name]['name'], $pointpos +1, $lastpos - $pointpos);
