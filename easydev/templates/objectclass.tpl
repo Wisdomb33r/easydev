@@ -1185,7 +1185,7 @@ foreach($this->fieldlist as $field){
   case 'double': %>
     $ret .= '  <tr>'."\n";
     $ret .= '    <td><% echo $field->label;%> : </td>'."\n".
-            '    <td><input type="text" name="<% echo $field->label;%>" '.($postedobject != null ? 'value="'.htmlentities($postedobject-><% echo $field->label;%>, ENT_COMPAT, 'UTF-8').'"' : '').'/>'."\n";
+            '    <td><input type="text" name="<% echo $field->label;%>" '.($postedobject != null && $postedobject-><% echo $field->label;%> != null ? 'value="'.htmlentities($postedobject-><% echo $field->label;%>, ENT_COMPAT, 'UTF-8').'"' : '').'/>'."\n";
     $ret .= '  </tr>'."\n";<%
     break;
   case 'password': %>
@@ -1201,7 +1201,7 @@ foreach($this->fieldlist as $field){
   case 'text': %>
     $ret .= '  <tr>'."\n";
     $ret .= '    <td><% echo $field->label;%> : </td>'."\n".
-            '    <td><textarea name="<% echo $field->label;%>">'.($postedobject != null ? htmlentities($postedobject-><% echo $field->label;%>, ENT_COMPAT, 'UTF-8') : '').'</textarea>'."\n";
+            '    <td><textarea name="<% echo $field->label;%>">'.($postedobject != null && $postedobject-><% echo $field->label;%> != null ? htmlentities($postedobject-><% echo $field->label;%>, ENT_COMPAT, 'UTF-8') : '').'</textarea>'."\n";
     $ret .= '  </tr>'."\n";<%
     break;
   case 'bool': %>
