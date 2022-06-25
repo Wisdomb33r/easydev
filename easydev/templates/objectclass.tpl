@@ -339,31 +339,30 @@ foreach($this->fieldlist as $field){
         $this->errors[] = Translator::translate('generator_add_object_boolean_unset').'<% echo $field->label;%>';<%
     break;
   case 'date': %>
-    if($this-><% echo $field->label; %>) {
+    if ($this-><% echo $field->label; %>) {
       $parsedDate = DateTimeImmutable::createFromFormat('Y-m-d', $this-><% echo $field->label; %>);
-      if(!$parsedDate){
+      if (!$parsedDate || $parsedDate->format('Y-m-d') !== $this-><% echo $field->label; %>) {
         $this->errors[] = Translator::translate('generator_add_object_date_format_error').'<% echo $field->label;%>';
-      } else {
-        $reformattedDate = $parsedDate->format('Y-m-d');
-        if($reformattedDate !== $this-><% echo $field->label; %>){
-          $this->errors[] = Translator::translate('generator_add_object_date_format_error').'<% echo $field->label;%>';
-        }
       }
     }<%
-    if(!isset($field->options['nullable']) || !$field->options['nullable']){ %>
-    else {
+    if(!isset($field->options['nullable']) || !$field->options['nullable']){
+    %> else {
       $this->errors[] = Translator::translate('generator_add_object_date_empty_error').'<% echo $field->label;%>';
     }<%
   	}
     break;
   case 'datetime': %>
-    $expl = explode('-', $this-><% echo $field->label; %>date);
-    if(count($expl) != 3 || $expl[0] < 1901 || $expl[0] > 2038 || $expl[1] > 12 || $expl[1] < 1 || $expl[2] > 31 || $expl[2] < 1){<%
-    if(isset($field->options['nullable']) && $field->options['nullable']){ %>
-      if(isset($this-><% echo $field->label; %>) && $this-><% echo $field->label; %> !== '')<%
-    }%>
+    if ($this-><% echo $field->label; %>date) {
+      $parsedDate = DateTimeImmutable::createFromFormat('Y-m-d', $this-><% echo $field->label; %>date);
+      if (!$parsedDate || $parsedDate->format('Y-m-d') !== $this-><% echo $field->label; %>date) {
         $this->errors[] = Translator::translate('generator_add_object_date_format_error').'<% echo $field->label;%>';
-    }
+      }
+    }<%
+    if(!isset($field->options['nullable']) || !$field->options['nullable']){
+    %> else {
+      $this->errors[] = Translator::translate('generator_add_object_date_empty_error').'<% echo $field->label;%>';
+    }<%
+    }%>
     if($this-><% echo $field->label; %>hour > 24 || $this-><% echo $field->label; %>hour < 0 || $this-><% echo $field->label; %>hour === ''){<%
     if(isset($field->options['nullable']) && $field->options['nullable']){ %>
       if(isset($this-><% echo $field->label; %>) && $this-><% echo $field->label; %> !== '')<%

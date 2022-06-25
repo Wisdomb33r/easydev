@@ -327,6 +327,7 @@ INSERT INTO `translation_strings` (`keyword`, `fr`, `en`) VALUES
 ('found', 'trouvé', 'found'),
 ('generator_add_object_boolean_unset', 'Valeur booléenne (vrai ou faux) attendue pour le champs : ', 'Boolean value (true or false) expected for field : '),
 ('generator_add_object_date_format_error', 'Le format de la date est incorrect. Veuillez insérer une date au format aaaa-mm-jj ou utilisez le calendrier visuel pour le champ : ', 'Date format is incorrect. Please enter date in yyyy-mm-dd format or use the visual calendar for the field : '),
+('generator_add_object_date_empty_error', 'Champ date obligatoire : ', 'Mandatory date field : '),
 ('generator_add_object_empty_text_error', 'Veuillez insérer un texte pour le champ ', 'Please insert a text in the field '),
 ('generator_add_object_expected_double', 'Valeur numérique attendue pour le champs : ', 'Numeric value expected for field : '),
 ('generator_add_object_expected_integer', 'Valeur numérique entière attendue pour le champs : ', 'Numeric value expected for field : '),
