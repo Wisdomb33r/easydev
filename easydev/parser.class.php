@@ -350,7 +350,7 @@ class parser{
 						array_push($fieldslist, $fieldobject);
 					}
 
-          // verify if there is too much string types
+          // verify if there are too many string fields
           if ($nbStringFields > MAX_NUMBER_STRING_FIELDS) {
             array_push($this->errorslist, Translator::translate('compile_max_string_fields_number_error') . $classname);
             return array();
