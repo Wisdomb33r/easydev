@@ -11,12 +11,6 @@ function recursive_stripslashes($value){
 }
 
 global $LINK;
-// handle the case when magic quotes are activated by removing all the backslashes in GPC
-if(get_magic_quotes_gpc()){
-	$_POST = recursive_stripslashes($_POST);
-	$_GET = recursive_stripslashes($_GET);
-	$_COOKIE = recursive_stripslashes($_COOKIE);
-}
 
 if(isset($_POST['Username']) && isset($_POST['Userpass'])) { // if username and password has been sent by POST method
 	$Name = $_POST['Username'];

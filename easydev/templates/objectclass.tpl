@@ -339,22 +339,30 @@ foreach($this->fieldlist as $field){
         $this->errors[] = Translator::translate('generator_add_object_boolean_unset').'<% echo $field->label;%>';<%
     break;
   case 'date': %>
-  	$exploded = explode('-', $this-><% echo $field->label; %>);
-    if(count($exploded) != 3 || $exploded[0] < 1901 || $exploded[0] > 2038 || $exploded[1] > 12 || $exploded[1] < 1 || $exploded[2] > 31 || $exploded[2] < 1){<%
-    if(isset($field->options['nullable']) && $field->options['nullable']){ %>
-      if(isset($this-><% echo $field->label; %>) && $this-><% echo $field->label; %> !== '')<%
-    }%>
+    if ($this-><% echo $field->label; %>) {
+      $parsedDate = DateTimeImmutable::createFromFormat('Y-m-d', $this-><% echo $field->label; %>);
+      if (!$parsedDate || $parsedDate->format('Y-m-d') !== $this-><% echo $field->label; %>) {
         $this->errors[] = Translator::translate('generator_add_object_date_format_error').'<% echo $field->label;%>';
+      }
     }<%
+    if(!isset($field->options['nullable']) || !$field->options['nullable']){
+    %> else {
+      $this->errors[] = Translator::translate('generator_add_object_date_empty_error').'<% echo $field->label;%>';
+    }<%
+  	}
     break;
   case 'datetime': %>
-    $expl = explode('-', $this-><% echo $field->label; %>date);
-    if(count($expl) != 3 || $expl[0] < 1901 || $expl[0] > 2038 || $expl[1] > 12 || $expl[1] < 1 || $expl[2] > 31 || $expl[2] < 1){<%
-    if(isset($field->options['nullable']) && $field->options['nullable']){ %>
-      if(isset($this-><% echo $field->label; %>) && $this-><% echo $field->label; %> !== '')<%
-    }%>
+    if ($this-><% echo $field->label; %>date) {
+      $parsedDate = DateTimeImmutable::createFromFormat('Y-m-d', $this-><% echo $field->label; %>date);
+      if (!$parsedDate || $parsedDate->format('Y-m-d') !== $this-><% echo $field->label; %>date) {
         $this->errors[] = Translator::translate('generator_add_object_date_format_error').'<% echo $field->label;%>';
-    }
+      }
+    }<%
+    if(!isset($field->options['nullable']) || !$field->options['nullable']){
+    %> else {
+      $this->errors[] = Translator::translate('generator_add_object_date_empty_error').'<% echo $field->label;%>';
+    }<%
+    }%>
     if($this-><% echo $field->label; %>hour > 24 || $this-><% echo $field->label; %>hour < 0 || $this-><% echo $field->label; %>hour === ''){<%
     if(isset($field->options['nullable']) && $field->options['nullable']){ %>
       if(isset($this-><% echo $field->label; %>) && $this-><% echo $field->label; %> !== '')<%
@@ -703,6 +711,7 @@ foreach($this->fieldlist as $field){
      * Delete the images from disk for this object.
      */
 	protected function removeImage<% echo $field->label; %>(){
+	  if($this-><% echo $field->label; %>){
       $paddedIdentifier = str_pad($this->id, 9, '0', STR_PAD_LEFT);
       $d1 = substr($paddedIdentifier, 0, 3);
       $d2 = substr($paddedIdentifier, 3, 3);
@@ -716,6 +725,7 @@ foreach($this->fieldlist as $field){
             }
           }
         }
+      }
 	  }
 	}<%
 	}
@@ -1174,7 +1184,7 @@ foreach($this->fieldlist as $field){
   case 'double': %>
     $ret .= '  <tr>'."\n";
     $ret .= '    <td><% echo $field->label;%> : </td>'."\n".
-            '    <td><input type="text" name="<% echo $field->label;%>" '.($postedobject != null ? 'value="'.htmlentities($postedobject-><% echo $field->label;%>, ENT_COMPAT, 'UTF-8').'"' : '').'/>'."\n";
+            '    <td><input type="text" name="<% echo $field->label;%>" '.($postedobject != null && $postedobject-><% echo $field->label;%> != null ? 'value="'.htmlentities($postedobject-><% echo $field->label;%>, ENT_COMPAT, 'UTF-8').'"' : '').'/>'."\n";
     $ret .= '  </tr>'."\n";<%
     break;
   case 'password': %>
@@ -1190,7 +1200,7 @@ foreach($this->fieldlist as $field){
   case 'text': %>
     $ret .= '  <tr>'."\n";
     $ret .= '    <td><% echo $field->label;%> : </td>'."\n".
-            '    <td><textarea name="<% echo $field->label;%>">'.($postedobject != null ? htmlentities($postedobject-><% echo $field->label;%>, ENT_COMPAT, 'UTF-8') : '').'</textarea>'."\n";
+            '    <td><textarea name="<% echo $field->label;%>">'.($postedobject != null && $postedobject-><% echo $field->label;%> != null ? htmlentities($postedobject-><% echo $field->label;%>, ENT_COMPAT, 'UTF-8') : '').'</textarea>'."\n";
     $ret .= '  </tr>'."\n";<%
     break;
   case 'bool': %>
@@ -1346,7 +1356,7 @@ foreach($textfields as $textfield){
     if(isset($_FILES[$name]) && $_FILES[$name]['error'] == 0){
     	$pointpos = strrpos($_FILES[$name]['name'], '.');
     	$lastpos = strlen($_FILES[$name]['name']) - 1;
-    	if($pointpos === false || $pointpos == $lastpos) $this->errors[] = Translator::translate('generator_add_object_file_no_extension').$file;
+    	if($pointpos === false || $pointpos == $lastpos) $this->errors[] = Translator::translate('generator_add_object_file_no_extension').$name;
     	else{
     		$temp_extension_var = $name.'_temp_file_extension';
 	    	$this->$temp_extension_var = substr($_FILES[$name]['name'], $pointpos +1, $lastpos - $pointpos);
@@ -1396,9 +1406,9 @@ foreach($textfields as $textfield){
   	if(isset($_FILES[$name]) && $_FILES[$name]['error'] == 0){
   		$imageinfos = getimagesize($_FILES[$name]['tmp_name']);
   		if(is_array($imageinfos) && count($imageinfos)){
+  			if($imageinfos[0] > MAX_IMAGE_WIDTH) $this->errors[] = Translator::translate('generator_add_object_image_too_width').$name;
+  			if($imageinfos[1] > MAX_IMAGE_HEIGHT) $this->errors[] = Translator::translate('generator_add_object_image_too_height').$name;
   			$imagetype = $imageinfos[2];
-  			if($imagetype[0] > MAX_IMAGE_WIDTH) $this->errors[] = Translator::translate('generator_add_object_image_too_width').$name;
-  			if($imagetype[1] > MAX_IMAGE_HEIGTH) $this->errors[] = Translator::translate('generator_add_object_image_too_height').$name;
   			switch($imagetype){
   				case IMAGETYPE_GIF:
   				case IMAGETYPE_JPEG:
