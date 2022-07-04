@@ -1,0 +1,32 @@
+version: "2"
+services:
+  webserver:
+    image: php:8.1-apache
+    ports:
+      - "80:80"
+    volumes:
+      - ../../easydev:/var/www/html/easydev
+    environment:
+      XDEBUG_CONFIG: remote_host=host.docker.internal
+    depends_on:
+      - database
+
+  database:
+    image: mariadb:10.4
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: blabla
+      MYSQL_DATABASE: bibliotheque
+    ports:
+      - "3306:3306"
+    volumes:
+      - ../../databases:/docker-entrypoint-initdb.d
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+
