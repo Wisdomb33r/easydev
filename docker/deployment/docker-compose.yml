@@ -1,11 +1,11 @@
-version: "2"
+version: "3.1"
 services:
   webserver:
-    image: php:8.1-apache
+    build: .
     ports:
       - "80:80"
     volumes:
-      - ../../easydev:/var/www/html/easydev
+      - ../../easydev:/var/www/html
     environment:
       XDEBUG_CONFIG: remote_host=host.docker.internal
     depends_on:
@@ -15,8 +15,10 @@ services:
     image: mariadb:10.4
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: blabla
-      MYSQL_DATABASE: bibliotheque
+      MARIADB_ROOT_PASSWORD: blabla
+      MARIADB_DATABASE: easydev0
+      MARIADB_USER: easydev
+      MARIADB_PASSWORD: t53cE56n6
     ports:
       - "3306:3306"
     volumes:
