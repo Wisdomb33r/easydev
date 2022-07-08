@@ -1,3 +1,5 @@
 .idea
-easydev/genscripts/**
-easydev/resources/**
+/ng-easydev/node_modules
+/ng-easydev/.angular/cache
+/easydev/genscripts
+/easydev/resources
