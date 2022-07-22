@@ -23,6 +23,7 @@ services:
       - "3306:3306"
     volumes:
       - ../../databases:/docker-entrypoint-initdb.d
+      - ./mariadb-configuration:/etc/mysql/conf.d:ro
 
   phpmyadmin:
     image: phpmyadmin
